@@ -1,0 +1,12 @@
+---
+# tasks file for bh-auto-install
+
+- block:
+    - name: Copy template file
+      template:
+        src: "{{ os_install.os }}.cfg"
+        force: yes
+        backup: no
+        mode: 0755
+        dest: "/var/www/html/{{ os_install.os }}.cfg"
+  delegate_to: "{{ pxe_server }}"
