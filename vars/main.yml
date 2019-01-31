@@ -1,2 +1,5 @@
 ---
 # vars file for bh-auto-install
+
+local_pxe_config_dir: "pxe_configs"
+local_pxe_config: "{{ local_pxe_config_dir + '/' + inventory_hostname }}"

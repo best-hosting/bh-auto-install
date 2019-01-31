@@ -9,4 +9,22 @@
         backup: no
         mode: 0755
         dest: "/var/www/html/{{ os_install.os }}.cfg"
+  delegate_to: "{{ kickstart_server }}"
+
+- block:
+    - name: Ensure local pxe configs directory exists
+      file:
+        dest:   "{{ local_pxe_config_dir }}"
+        state:  directory
+    - name: Create pxe config
+      template:
+        src:  "pxelinux_host.cfg"
+        dest: "{{ local_pxe_config }}"
+  delegate_to: 'localhost'
+
+- block:
+    - name: Add pxe menu item.
+      blockinfile:
+        block: "{{ lookup('file', '{{ local_pxe_config }}') }}"
+        path: "{{ pxelinux_cfg }}"
   delegate_to: "{{ pxe_server }}"
