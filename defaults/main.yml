@@ -1,2 +1,5 @@
 ---
 # defaults file for bh-auto-install
+
+# LVM volume group name.
+vg_name: "{{ inventory_hostname }}"
