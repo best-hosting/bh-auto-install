@@ -1,0 +1,36 @@
+---
+# Tasks for hosts in `servers` group (hosts, where i want to install OS).
+
+- block:
+    - name: Copy template file
+      template:
+        src: "{{ os_install.os }}.cfg"
+        force: yes
+        backup: no
+        mode: 0755
+        dest: "/var/www/html/{{ os_install.os }}.cfg"
+  delegate_to: "{{ kickstart_server }}"
+  when: inventory_hostname in groups['new']
+
+# Enforce correct state of pxe host configs. Create for hosts in `new` group
+# and delete for hosts in `installed` group. Hosts in other groups are
+# _ignored_.
+- block:
+    - name: Ensure pxe hosts config directory exists
+      file:
+        dest:   "{{ pxe_hosts_cfg_dir }}"
+        state:  directory
+    - name: Create host pxe config for new hosts
+      template:
+        src:  "pxelinux_host.cfg"
+        force:  yes
+        backup: yes
+        dest: "{{ pxe_hosts_cfg_dir + '/50_' + inventory_hostname }}"
+      when: inventory_hostname in groups['new']
+    - name: Delete host pxe configs for _already_ installed hosts
+      file:
+        dest: "{{ pxe_hosts_cfg_dir + '/' + inventory_hostname }}"
+        state: absent
+      when: inventory_hostname in groups['installed']
+  delegate_to: "{{ pxe_server }}"
+

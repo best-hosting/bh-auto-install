@@ -1,5 +1,6 @@
 ---
 # vars file for bh-auto-install
 
-local_pxe_config_dir: "pxe_configs"
-local_pxe_config: "{{ local_pxe_config_dir + '/' + inventory_hostname }}"
+# Path, where to store hosts pxe configs (on `pxe_server`). They'll be later
+# added into `pxelinux_cfg` as `Hosts` submenu.
+pxe_hosts_cfg_dir: "/srv/tftp/pxelinux_hosts.cfg.d"

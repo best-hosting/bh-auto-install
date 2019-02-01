@@ -1,0 +1,27 @@
+---
+# Tasks for hosts in `control` group (hosts, where i will _never_ want to
+# install OS).
+
+- block:
+    - name: Ensure pxe hosts config directory exists
+      file:
+        dest:   "{{ pxe_hosts_cfg_dir }}"
+        state:  directory
+    - name: Copy header and footer pxe config files
+      copy:
+        src:    "{{ item }}"
+        dest:   "{{ pxe_hosts_cfg_dir + '/' + item | basename }}"
+        owner:  root
+        group:  root
+        mode:   0640
+        force:  yes
+        backup: no
+      with_fileglob:
+        - "pxelinux/*.cfg"
+    - name: Generate pxe Hosts menu item
+      assemble:
+        src: "{{ pxe_hosts_cfg_dir }}"
+        regexp: "[0-9]_[^/]+$"
+        dest: "{{ pxelinux_host_cfg }}"
+  when: inventory_hostname in groups['pxe']
+

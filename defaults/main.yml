@@ -4,5 +4,6 @@
 # LVM volume group name.
 vg_name: "{{ inventory_hostname }}"
 
-# Default path to `pxelinux.cfg/default`.
-pxelinux_cfg: "/srv/tftp/pxelinux.cfg/default"
+# Path to hosts pxe config. It should be included somewhere in
+# `pxelinux.cfg/default`.
+pxelinux_host_cfg: "/srv/tftp/pxelinux.cfg/hosts.cfg"
