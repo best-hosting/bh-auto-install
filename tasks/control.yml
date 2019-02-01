@@ -21,7 +21,7 @@
     - name: Generate pxe Hosts menu item
       assemble:
         src: "{{ pxe_hosts_cfg_dir }}"
-        regexp: "[0-9]_[^/]+$"
+        regexp: "[0-9]_[^/]+\\.cfg$"
         dest: "{{ pxelinux_host_cfg }}"
   when: inventory_hostname in groups['pxe']
 

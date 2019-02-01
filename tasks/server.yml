@@ -25,11 +25,11 @@
         src:  "pxelinux_host.cfg"
         force:  yes
         backup: yes
-        dest: "{{ pxe_hosts_cfg_dir + '/50_' + inventory_hostname }}"
+        dest: "{{ pxe_host_cfg }}"
       when: inventory_hostname in groups['new']
     - name: Delete host pxe configs for _already_ installed hosts
       file:
-        dest: "{{ pxe_hosts_cfg_dir + '/' + inventory_hostname }}"
+        dest: "{{ pxe_host_cfg }}"
         state: absent
       when: inventory_hostname in groups['installed']
   delegate_to: "{{ pxe_server }}"
