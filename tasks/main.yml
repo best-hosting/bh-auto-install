@@ -9,11 +9,11 @@
 
 - block:
     - name: Server tasks.
-      import_tasks: server.yml
+      include_tasks: server.yml
   when: inventory_hostname in groups['servers']
 
 - block:
     - name: Control server tasks.
-      import_tasks: control.yml
+      include_tasks: control.yml
   when: inventory_hostname in groups['control']
 
