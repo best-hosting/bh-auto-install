@@ -7,7 +7,7 @@
       file:
         dest:   "{{ pxe_hosts_cfg_dir }}"
         state:  directory
-    - name: Copy header and footer pxe config files
+    - name: Copy header and footer pxe configs, if generating full menu
       copy:
         src:    "{{ item }}"
         dest:   "{{ pxe_hosts_cfg_dir + '/' + item | basename }}"
@@ -16,8 +16,18 @@
         mode:   0640
         force:  yes
         backup: no
-      with_fileglob:
-        - "pxelinux/*.cfg"
+      loop:
+        - "pxelinux/00_pxelinux_header.cfg"
+        - "pxelinux/99_pxelinux_footer.cfg"
+      when: pxe_full_menu
+    - name: Or delete header and footer pxe configs, if generating only menu items
+      file:
+        dest:   "{{ pxe_hosts_cfg_dir + '/' + item | basename }}"
+        state:  absent
+      loop:
+        - "pxelinux/00_pxelinux_header.cfg"
+        - "pxelinux/99_pxelinux_footer.cfg"
+      when: not pxe_full_menu
     - name: Generate pxe Hosts menu item
       assemble:
         src: "{{ pxe_hosts_cfg_dir }}"

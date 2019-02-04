@@ -7,3 +7,7 @@ vg_name: "{{ inventory_hostname }}"
 # Path to hosts pxe config. It should be included somewhere in
 # `pxelinux.cfg/default`.
 pxelinux_host_cfg: "/srv/tftp/pxelinux.cfg/hosts.cfg"
+
+# Generate full pxe menu block (if enabled) or just menu items (require `MENU
+# BEGIN` and `MENU END` in main pxe config).
+pxe_full_menu: no
