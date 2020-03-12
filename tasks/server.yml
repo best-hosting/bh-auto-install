@@ -8,7 +8,7 @@
         force: yes
         backup: no
         mode: 0755
-        dest: "/var/www/html/{{ os_install.os }}.cfg"
+        dest: "{{ ks_www_root }}/{{ os_install.os }}.cfg"
   delegate_to: "{{ kickstart_server }}"
   when: inventory_hostname in groups['new']
 
