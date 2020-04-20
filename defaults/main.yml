@@ -18,3 +18,8 @@ ks_www_addr: "{{ hostvars[pxe_server]['ansible_facts']['default_ipv4']['address'
 # Web server root directory, where to place kickstart config.
 ks_www_root: "/var/www/pxe"
 
+# Whether to build raid by default.
+default_raid: false
+
+# Whether to use lvm by default.
+default_lvm: false

@@ -2,13 +2,35 @@
 # Tasks for hosts in `servers` group (hosts, where i want to install OS).
 
 - block:
-    - name: Copy template file
+    - name: servers | Define OS install config
+      set_fact:
+        _os_install: >-
+          {{  { 'raid': default_raid
+              , 'lvm' : default_lvm
+              , 'rootpw' : lookup('file',
+                              lookup('first_found',
+                                [ 'passwords/' + inventory_hostname
+                                , 'passwords/default'
+                                ])
+                              )
+              , 'disks' : ['sda', 'sdb'] if item_raid else ['sda']
+              } | combine(os_install)
+          }}
+      vars:
+        item_raid: os_install.raid | default(default_raid)
+
+    - name: servers | Show OS install config
+      debug:
+        var: _os_install
+
+- block:
+    - name: server | Copy template file
       template:
-        src: "{{ os_install.os }}.cfg"
+        src: "{{ _os_install.os }}.cfg"
         force: yes
         backup: no
         mode: 0755
-        dest: "{{ ks_www_root }}/{{ os_install.os }}.cfg"
+        dest: "{{ ks_www_root }}/{{ _os_install.os }}.cfg"
   delegate_to: "{{ kickstart_server }}"
   when: inventory_hostname in groups['new']
 
@@ -16,7 +38,7 @@
 # and delete for hosts in `installed` group. Hosts in other groups are
 # _ignored_.
 - block:
-    - name: Ensure pxe hosts config directory exists
+    - name: server | Ensure pxe hosts config directory exists
       file:
         dest:   "{{ pxe_hosts_cfg_dir }}"
         state:  directory
@@ -27,7 +49,7 @@
         backup: yes
         dest: "{{ pxe_host_cfg }}"
       when: inventory_hostname in groups['new']
-    - name: Delete host pxe configs for _already_ installed hosts
+    - name: server | Delete host pxe configs for _already_ installed hosts
       file:
         dest: "{{ pxe_host_cfg }}"
         state: absent

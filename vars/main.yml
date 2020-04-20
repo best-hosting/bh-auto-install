@@ -7,3 +7,6 @@ pxe_hosts_cfg_dir: "/srv/tftp/pxelinux_hosts.cfg.d"
 
 # Full path to current host pxe config.
 pxe_host_cfg: "{{ pxe_hosts_cfg_dir + '/50_' + inventory_hostname + '.cfg' }}"
+
+# Internal os_install .
+_os_install: {}
