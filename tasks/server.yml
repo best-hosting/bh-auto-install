@@ -14,10 +14,30 @@
                                 ])
                               )
               , 'disks' : ['sda', 'sdb'] if item_raid else ['sda']
-              } | combine(os_install)
+              } | combine(os_install, {'net' : item_net})
           }}
       vars:
-        item_raid: os_install.raid | default(default_raid)
+        item_raid: >-
+          {{ os_install.raid | default(default_raid) }}
+        item_ip0_network: >-
+          {{ os_install.net[0].ip | ipaddr('network') }}
+        # Default value for 'net[0].ip' .
+        def_ip0: >-
+          {{  { 'gw' : default_net[item_ip0_network].gw
+                        if default_net[item_ip0_network].gw is defined
+                        else os_install.net[0].gw
+              , 'ns' : default_net[item_ip0_network].ns
+                        if default_net[item_ip0_network].ns is defined
+                        else os_install.net[0].ns
+              } if default_net[item_ip0_network] is defined
+                else
+                { 'gw' : os_install.net[0].gw
+                , 'ns' : os_install.net[0].ns
+                }
+          }}
+        # Resulting 'net' list.
+        item_net: >-
+          {{ [def_ip0 | combine(os_install.net[0])] + os_install.net[1:] }}
 
     - name: servers | Show OS install config
       debug:
