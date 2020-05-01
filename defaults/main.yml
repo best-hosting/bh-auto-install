@@ -4,9 +4,13 @@
 # LVM volume group name.
 vg_name: "{{ inventory_hostname }}"
 
+# Root directory, where pxe images, pxelinux config and other stuff is
+# located.
+pxe_dir: "/srv/tftp"
+
 # Path to hosts pxe config. It should be included somewhere in
 # `pxelinux.cfg/default`.
-pxelinux_host_cfg: "/srv/tftp/pxelinux.cfg/hosts.cfg"
+pxelinux_host_cfg: "{{ pxe_dir + '/pxelinux.cfg/hosts.cfg' }}"
 
 # Generate full pxe menu block (if enabled) or just menu items (require `MENU
 # BEGIN` and `MENU END` in main pxe config).

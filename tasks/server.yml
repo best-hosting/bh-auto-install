@@ -14,14 +14,19 @@
                                 ])
                               )
               , 'disks' : ['sda', 'sdb'] if item_raid else ['sda']
-              } | combine(os_install, {'net' : item_net})
+              } | combine(os_install,
+                    { 'pxe_cfg' : pxe_hosts_cfg_dir + '/50_' + item_name + '.cfg'
+                    , 'net'     : item_net
+                    }
+                  )
           }}
       vars:
+        item_name: >-
+          {{ os_install.name | default(inventory_hostname) }}
         item_raid: >-
           {{ os_install.raid | default(default_raid) }}
         item_ip0_network: >-
           {{ os_install.net[0].ip | ipaddr('network') }}
-        # Default value for 'net[0].ip' .
         def_ip0: >-
           {{  { 'gw' : default_net[item_ip0_network].gw
                         if default_net[item_ip0_network].gw is defined
@@ -35,7 +40,6 @@
                 , 'ns' : os_install.net[0].ns
                 }
           }}
-        # Resulting 'net' list.
         item_net: >-
           {{ [def_ip0 | combine(os_install.net[0])] + os_install.net[1:] }}
 
@@ -67,11 +71,11 @@
         src:  "pxelinux_host.cfg"
         force:  yes
         backup: yes
-        dest: "{{ pxe_host_cfg }}"
+        dest: "{{ _os_install.pxe_cfg }}"
       when: inventory_hostname in groups['new']
     - name: server | Delete host pxe configs for _already_ installed hosts
       file:
-        dest: "{{ pxe_host_cfg }}"
+        dest: "{{ _os_install.pxe_cfg }}"
         state: absent
       when: inventory_hostname in groups['installed']
   delegate_to: "{{ pxe_server }}"

@@ -2,11 +2,8 @@
 # vars file for bh-auto-install
 
 # Path, where to store hosts pxe configs (on `pxe_server`). They'll be later
-# added into `pxelinux_cfg` as `Hosts` submenu.
-pxe_hosts_cfg_dir: "/srv/tftp/pxelinux_hosts.cfg.d"
-
-# Full path to current host pxe config.
-pxe_host_cfg: "{{ pxe_hosts_cfg_dir + '/50_' + inventory_hostname + '.cfg' }}"
+# assembled into `pxelinux_host_cfg` as `Hosts` submenu.
+pxe_hosts_cfg_dir: "{{ pxe_dir + '/pxelinux_hosts.cfg.d' }}"
 
 # Internal os_install .
 _os_install: {}
