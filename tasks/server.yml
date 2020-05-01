@@ -16,6 +16,8 @@
               , 'disks' : ['sda', 'sdb'] if item_raid else ['sda']
               } | combine(os_install,
                     { 'pxe_cfg' : pxe_hosts_cfg_dir + '/50_' + item_name + '.cfg'
+                    , 'ks_cfg'  : ks_www_root + '/' + item_name + '.cfg'
+                    , 'ks_www'  : 'http://' + ks_www_addr + '/' + item_name + '.cfg'
                     , 'net'     : item_net
                     }
                   )
@@ -47,33 +49,38 @@
       debug:
         var: _os_install
 
+# Enforce correct state of kickstart and pxe host configs: create for hosts in
+# `new` group and delete for hosts in `installed` group. Hosts in other groups
+# are _ignored_.
 - block:
-    - name: server | Copy template file
+    - name: server | (kickstart) Create kickstart config for new hosts
       template:
         src: "{{ _os_install.os }}.cfg"
         force: yes
         backup: no
         mode: 0755
-        dest: "{{ ks_www_root }}/{{ _os_install.os }}.cfg"
+        dest: "{{ _os_install.ks_cfg }}"
+      when: inventory_hostname in groups['new']
+    - name: server | (kickstart) Delete kickstart config for _already_ installed hosts
+      file:
+        dest: "{{ _os_install.ks_cfg }}"
+        state: absent
+      when: inventory_hostname in groups['installed']
   delegate_to: "{{ kickstart_server }}"
-  when: inventory_hostname in groups['new']
 
-# Enforce correct state of pxe host configs. Create for hosts in `new` group
-# and delete for hosts in `installed` group. Hosts in other groups are
-# _ignored_.
 - block:
-    - name: server | Ensure pxe hosts config directory exists
+    - name: server | (pxe) Ensure hosts config directory exists
       file:
         dest:   "{{ pxe_hosts_cfg_dir }}"
         state:  directory
-    - name: Create host pxe config for new hosts
+    - name: server | (pxe) Create host config for new hosts
       template:
         src:  "pxelinux_host.cfg"
         force:  yes
         backup: yes
         dest: "{{ _os_install.pxe_cfg }}"
       when: inventory_hostname in groups['new']
-    - name: server | Delete host pxe configs for _already_ installed hosts
+    - name: server | (pxe) Delete host configs for _already_ installed hosts
       file:
         dest: "{{ _os_install.pxe_cfg }}"
         state: absent
