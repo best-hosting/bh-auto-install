@@ -1,8 +1,7 @@
 ---
-# Tasks for hosts in `servers` group (hosts, where i want to install OS).
 
 - block:
-    - name: servers | Define OS install config
+    - name: define | Define OS install config
       set_fact:
         _os_install: >-
           {{  { 'raid': default_raid
@@ -45,45 +44,9 @@
         item_net: >-
           {{ [def_ip0 | combine(os_install.net[0])] + os_install.net[1:] }}
 
-    - name: servers | Show OS install config
+    - name: define | Show OS install config
       debug:
         var: _os_install
 
-# Enforce correct state of kickstart and pxe host configs: create for hosts in
-# `new` group and delete for hosts in `installed` group. Hosts in other groups
-# are _ignored_.
-- block:
-    - name: server | (kickstart) Create kickstart config for new hosts
-      template:
-        src: "{{ _os_install.os }}.cfg"
-        force: yes
-        backup: no
-        mode: 0755
-        dest: "{{ _os_install.ks_cfg }}"
-      when: inventory_hostname in groups['new']
-    - name: server | (kickstart) Delete kickstart config for _already_ installed hosts
-      file:
-        dest: "{{ _os_install.ks_cfg }}"
-        state: absent
-      when: inventory_hostname in groups['installed']
-  delegate_to: "{{ kickstart_server }}"
-
-- block:
-    - name: server | (pxe) Ensure hosts config directory exists
-      file:
-        dest:   "{{ pxe_hosts_cfg_dir }}"
-        state:  directory
-    - name: server | (pxe) Create host config for new hosts
-      template:
-        src:  "pxelinux_host.cfg"
-        force:  yes
-        backup: yes
-        dest: "{{ _os_install.pxe_cfg }}"
-      when: inventory_hostname in groups['new']
-    - name: server | (pxe) Delete host configs for _already_ installed hosts
-      file:
-        dest: "{{ _os_install.pxe_cfg }}"
-        state: absent
-      when: inventory_hostname in groups['installed']
-  delegate_to: "{{ pxe_server }}"
+  when: inventory_hostname in groups['servers']
 

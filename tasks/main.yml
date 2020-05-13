@@ -7,13 +7,12 @@
 # role. So, this should be done from main playbook, by first launching the
 # role for hosts in `servers`, and then for hosts in `control` group.
 
-- block:
-    - name: Server tasks.
-      include_tasks: server.yml
-  when: inventory_hostname in groups['servers']
+- name: Define variables.
+  import_tasks: define.yml
 
-- block:
-    - name: Control server tasks.
-      include_tasks: control.yml
-  when: inventory_hostname in groups['control']
+- name: Configure pxe.
+  import_tasks: pxe.yml
+
+- name: Configure kickstart.
+  include_tasks: kickstart.yml
 

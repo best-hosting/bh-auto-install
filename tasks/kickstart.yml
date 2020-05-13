@@ -1,0 +1,23 @@
+---
+
+# Enforce correct state of kickstart and pxe host configs: create for hosts in
+# `new` group and delete for hosts in `installed` group. Hosts in other groups
+# are _ignored_.
+- block:
+    - name: kickstart | Create config for new hosts
+      template:
+        src: "{{ _os_install.os }}.cfg"
+        force: yes
+        backup: no
+        mode: 0755
+        dest: "{{ _os_install.ks_cfg }}"
+      when: inventory_hostname in groups['new']
+
+    - name: kickstart | Delete config for _already_ installed hosts
+      file:
+        dest: "{{ _os_install.ks_cfg }}"
+        state: absent
+      when: inventory_hostname in groups['installed']
+
+  delegate_to: "{{ kickstart_server }}"
+

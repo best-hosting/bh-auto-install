@@ -1,0 +1,63 @@
+---
+
+# Enforce correct state of kickstart and pxe host configs: create for hosts in
+# `new` group and delete for hosts in `installed` group. Hosts in other groups
+# are _ignored_.
+
+- block:
+    - name: pxe | Ensure hosts config directory exists
+      file:
+        dest:   "{{ pxe_hosts_cfg_dir }}"
+        state:  directory
+
+    - name: pxe | Copy header and footer configs (for full menu)
+      copy:
+        src:    "{{ item }}"
+        dest:   "{{ pxe_hosts_cfg_dir + '/' + item | basename }}"
+        owner:  root
+        group:  root
+        mode:   0640
+        force:  yes
+        backup: no
+      loop:
+        - "pxelinux/00_pxelinux_header.cfg"
+        - "pxelinux/99_pxelinux_footer.cfg"
+      when: pxe_full_menu
+
+    - name: pxe | Or delete header and footer configs (if menu items only)
+      file:
+        dest:   "{{ pxe_hosts_cfg_dir + '/' + item | basename }}"
+        state:  absent
+      loop:
+        - "pxelinux/00_pxelinux_header.cfg"
+        - "pxelinux/99_pxelinux_footer.cfg"
+      when: not pxe_full_menu
+
+  delegate_to: >-
+    {{ pxe_server if inventory_hostname in groups['servers']
+        else inventory_hostname }}
+
+- block:
+    - name: pxe | Create config for new hosts
+      template:
+        src:  "pxelinux_host.cfg"
+        force:  yes
+        backup: yes
+        dest: "{{ _os_install.pxe_cfg }}"
+      when: inventory_hostname in groups['new']
+
+    - name: pxe | Delete configs for installed hosts
+      file:
+        dest: "{{ _os_install.pxe_cfg }}"
+        state: absent
+      when: inventory_hostname in groups['installed']
+
+    - name: pxe | Generate Hosts menu
+      assemble:
+        src: "{{ pxe_hosts_cfg_dir }}"
+        regexp: "[0-9]_[^/]+\\.cfg$"
+        dest: "{{ pxelinux_host_cfg }}"
+
+  when: inventory_hostname in groups['servers']
+  delegate_to: "{{ pxe_server }}"
+
