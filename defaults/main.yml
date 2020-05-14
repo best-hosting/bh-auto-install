@@ -1,9 +1,6 @@
 ---
 # defaults file for bh-auto-install
 
-# LVM volume group name.
-vg_name: "{{ inventory_hostname }}"
-
 # Root directory, where pxe images, pxelinux config and other stuff is
 # located.
 pxe_dir: "/srv/tftp"
@@ -35,4 +32,16 @@ default_lvm: false
 # defaults for corresponding network should be specified here in
 # 'default_net'.
 default_net: {}
+
+# os_install:
+# - 'name'
+# - 'raid'
+# - 'lvm'
+# - 'vg_name'
+# - 'rootpw'
+# - 'disks'
+# - 'net:'
+# -   'ip'
+# -   'gw'
+# -   'ns'
 

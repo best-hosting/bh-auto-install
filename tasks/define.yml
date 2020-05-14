@@ -6,15 +6,17 @@
         _os_install: >-
           {{  { 'raid': default_raid
               , 'lvm' : default_lvm
-              , 'rootpw' : lookup('file',
+              , 'vg_name' : item_name
+              , 'rootpw'  : lookup('file',
                               lookup('first_found',
-                                [ 'passwords/' + inventory_hostname
+                                [ 'passwords/' + item_name
                                 , 'passwords/default'
                                 ])
                               )
               , 'disks' : ['sda', 'sdb'] if item_raid else ['sda']
               } | combine(os_install,
-                    { 'pxe_cfg' : pxe_hosts_cfg_dir + '/50_' + item_name + '.cfg'
+                    { 'name'    : item_name
+                    , 'pxe_cfg' : pxe_hosts_cfg_dir + '/50_' + item_name + '.cfg'
                     , 'ks_cfg'  : ks_www_root + '/' + item_name + '.cfg'
                     , 'ks_www'  : 'http://' + ks_www_addr + '/' + item_name + '.cfg'
                     , 'net'     : item_net
