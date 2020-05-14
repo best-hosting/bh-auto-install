@@ -44,12 +44,14 @@
         force:  yes
         backup: yes
         dest: "{{ _os_install.pxe_cfg }}"
+      register: pxe_hosts_added
       when: inventory_hostname in groups['new']
 
     - name: pxe | Delete configs for installed hosts
       file:
         dest: "{{ _os_install.pxe_cfg }}"
         state: absent
+      register: pxe_hosts_deleted
       when: inventory_hostname in groups['installed']
 
     - name: pxe | Generate Hosts menu
@@ -57,6 +59,7 @@
         src: "{{ pxe_hosts_cfg_dir }}"
         regexp: "[0-9]_[^/]+\\.cfg$"
         dest: "{{ pxelinux_host_cfg }}"
+      when: pxe_hosts_added.changed or pxe_hosts_deleted.changed
 
   when: inventory_hostname in groups['servers']
   delegate_to: "{{ pxe_server }}"
