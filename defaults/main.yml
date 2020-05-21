@@ -45,3 +45,26 @@ default_net: {}
 # -   'gw'
 # -   'ns'
 
+pxe_os:
+  - { 'name': 'CentOS-6'
+    , 'url' : 'https://mirror.yandex.ru/centos/6/isos/x86_64/'
+    , 'checksum_fn': 'sha256sum.txt.asc'
+    , 'checksum_iso_name_rx': '(?<=  )CentOS-6\.[0-9]+-x86_64-netinstall\.iso$'
+    , 'kernel': 'images/pxeboot/vmlinuz'
+    , 'initrd': 'images/pxeboot/initrd.img'
+    }
+  - { 'name': 'CentOS-7'
+    , 'url' : 'https://mirror.yandex.ru/centos/7/isos/x86_64'
+    , 'checksum_fn' : 'sha256sum.txt.asc'
+    , 'checksum_iso_name_rx': '(?<=  )CentOS-7-x86_64-NetInstall-[0-9]+\.iso$'
+    , 'kernel': 'images/pxeboot/vmlinuz'
+    , 'initrd': 'images/pxeboot/initrd.img'
+    }
+  - { 'name': 'CentOS-8'
+    , 'url' : 'https://mirror.yandex.ru/centos/8/isos/x86_64/'
+    , 'checksum_fn': 'CHECKSUM'
+    , 'checksum_iso_name_rx': '(?<=SHA256 \()CentOS-8\.[0-9]+\.[0-9]+-x86_64-boot\.iso(?=\) = )'
+    , 'kernel': 'images/pxeboot/vmlinuz'
+    , 'initrd': 'images/pxeboot/initrd.img'
+    }
+

@@ -1,0 +1,89 @@
+---
+
+- block:
+    - name: images | Define internal pxe OS list
+      set_fact:
+        _pxe_os: >-
+          {{ _pxe_os +
+              [ item | combine(
+                          { 'checksum_url'  : item.url + '/' + item.checksum_fn
+                          , 'checksum_dir'  : item_checksum_dir
+                          , 'checksum_file' : item_checksum_dir + '/' + item.checksum_fn
+                          }
+                        )
+              ]
+          }}
+      vars:
+        item_checksum_dir: "{{ images_checksum_dir + '/' + item.name }}"
+      loop: "{{ pxe_os }}"
+
+    - name: images | Show pxe OS definitions
+      debug:
+        var: _pxe_os
+
+- block:
+    - name: images (localhost) | Create image checksum directories
+      file:
+        name: "{{ item.checksum_dir }}"
+        state: directory
+      loop: "{{ _pxe_os }}"
+
+    - name: images (localhost) | Download checksum file
+      get_url:
+        url:  "{{ item.checksum_url }}"
+        dest: "{{ item.checksum_file }}"
+        #{{ image_checksum_dir + '/' + item.checksum_url | urlsplit('path') | basename }}
+        force: yes
+      loop: "{{ _pxe_os }}"
+
+    - name: images (localhost) | Read checksum file
+      set_fact:
+        _os_iso: >-
+          {{ _os_iso +
+                [ { 'iso_name'  : item_iso_name
+                  , 'iso_url'   : item.url + '/' + item_iso_name
+                  , 'iso_dest'  : item_iso_dest
+                  , 'iso_file'  : item_iso_dest + '/' + item_iso_name
+                  , 'os_files'  : [item.kernel, item.initrd]
+                  }
+                ]
+          }}
+      vars:
+        item_iso_name: >-
+          {{ lookup('file', item.checksum_file)
+                | regex_search(item.checksum_iso_name_rx, multiline=true)
+          }}
+        item_iso_dest: >-
+          {{ pxe_dir + '/' + item.name + '-huy' }}
+      loop: "{{ _pxe_os }}"
+
+    - name: images | Show OS image definitions
+      debug:
+        var: _os_iso
+
+  delegate_to: localhost
+
+- block:
+    - name: images (localhost) | Create image checksum directories
+      file:
+        name: "{{ item.iso_dest }}"
+        state: directory
+      loop: "{{ _os_iso }}"
+
+    - name: images (pxe_server) | Download iso
+      get_url:
+        url:  "{{ item.iso_url }}"
+        dest: "{{ item.iso_file }}"
+        force: no
+      loop: "{{ _os_iso }}"
+
+    - name: images (pxe_server) | Extract kernel and initrd
+      iso_extract:
+        image:  "{{ item.iso_file }}"
+        dest:   "{{ item.iso_dest }}"
+        files:  "{{ item.os_files }}"
+        force:  true
+      loop: "{{ _os_iso }}"
+
+  delegate_to: "{{ pxe_server }}"
+

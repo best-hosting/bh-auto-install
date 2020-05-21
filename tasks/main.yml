@@ -1,12 +1,5 @@
 ---
 
-# Here're two blocks: first is for preparing everything needed for host,
-# _where_ i want to install OS. And the second is for configuring _pxe server
-# itself_. The pxe server configuration task should be run _strictly after_
-# all host tasks have been _finished_. But i can't ensure this ordering from a
-# role. So, this should be done from main playbook, by first launching the
-# role for hosts in `servers`, and then for hosts in `control` group.
-
 - name: Define variables.
   import_tasks: define.yml
 
@@ -16,3 +9,7 @@
 - name: Configure kickstart.
   include_tasks: kickstart.yml
 
+- name: Update pxe images
+  import_tasks: images.yml
+  tags:
+    - image

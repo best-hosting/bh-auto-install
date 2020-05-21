@@ -7,3 +7,8 @@ pxe_hosts_cfg_dir: "{{ pxe_dir + '/pxelinux_hosts.cfg.d' }}"
 
 # Internal os_install .
 _os_install: {}
+
+images_checksum_dir: "{{ playbook_dir + '/image_checksums' }}"
+
+_pxe_os: []
+_os_iso: []
