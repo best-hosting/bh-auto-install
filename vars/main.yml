@@ -10,5 +10,5 @@ _os_install: {}
 
 images_checksum_dir: "{{ playbook_dir + '/image_checksums' }}"
 
-_pxe_os: []
-_os_iso: []
+_pxe_os: {}
+_os_iso: {}

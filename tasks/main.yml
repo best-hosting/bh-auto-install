@@ -2,6 +2,8 @@
 
 - name: Define variables.
   import_tasks: define.yml
+  tags:
+    - always
 
 - name: Configure pxe.
   import_tasks: pxe.yml
