@@ -1,27 +1,6 @@
 ---
 
 - block:
-    - name: images | Define host pxe OS
-      set_fact:
-        _pxe_os: >-
-          {{ cur_os | combine(
-                { 'name' : cur_os_name
-                , 'checksum_url'  : cur_os.url + '/' + cur_os.checksum_fn
-                , 'checksum_dir'  : os_checksum_dir
-                , 'checksum_file' : os_checksum_dir + '/' + cur_os.checksum_fn
-                }
-              )
-          }}
-      vars:
-        cur_os_name: "{{ _os_install['os'] }}"
-        cur_os: "{{ pxe_os[cur_os_name] }}"
-        os_checksum_dir: "{{ images_checksum_dir + '/' + cur_os_name }}"
-
-    - name: images | Show pxe OS definitions
-      debug:
-        var: _pxe_os
-
-- block:
     - name: images (localhost) | Create image checksum directories
       file:
         name: "{{ _pxe_os.checksum_dir }}"
@@ -41,16 +20,18 @@
              , 'iso_url'   : _pxe_os.url + '/' + cur_iso_name
              , 'iso_dest'  : cur_iso_dest
              , 'iso_file'  : cur_iso_dest + '/' + cur_iso_name
-             , 'os_files'  : [_pxe_os.kernel, _pxe_os.initrd]
+             , 'os_files'  : [_pxe_os.iso_kernel, _pxe_os.iso_initrd]
              }
           }}
       vars:
+        cur_pxe_dir: >-
+          {{ hostvars[_os_install['pxe_server']].pxe_root_dir }}
+        cur_iso_dest: >-
+          {{ cur_pxe_dir + '/' + _pxe_os.pxe_dir }}
         cur_iso_name: >-
           {{ lookup('file', _pxe_os.checksum_file)
                 | regex_search(_pxe_os.checksum_iso_name_rx, multiline=true)
           }}
-        cur_iso_dest: >-
-          {{ pxe_dir + '/' + _pxe_os.name + '-huy' }}
 
     - name: images | Show OS image definitions
       debug:
@@ -77,5 +58,5 @@
         files:  "{{ _os_iso.os_files }}"
         force:  true
 
-  delegate_to: "{{ pxe_server }}"
+  delegate_to: "{{ _os_install['pxe_server'] }}"
 

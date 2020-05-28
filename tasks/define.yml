@@ -16,7 +16,9 @@
               , 'disks' : ['sda', 'sdb'] if item_raid else ['sda']
               } | combine(os_install,
                     { 'name'    : item_name
-                    , 'pxe_cfg' : pxe_hosts_cfg_dir + '/50_' + item_name + '.cfg'
+                    , 'pxe_server'  : item_pxe_server
+                    , 'pxe_cfg_dir' : item_pxe_cfg_dir
+                    , 'pxe_cfg' : item_pxe_cfg_dir + '/50_' + item_name + '.cfg'
                     , 'ks_cfg'  : ks_www_root + '/' + item_name + '.cfg'
                     , 'ks_www'  : 'http://' + ks_www_addr + '/' + item_name + '.cfg'
                     , 'net'     : item_net
@@ -45,10 +47,43 @@
           }}
         item_net: >-
           {{ [def_ip0 | combine(os_install.net[0])] + os_install.net[1:] }}
+        item_pxe_server: >-
+          {{ os_install.pxe_server | default(groups['pxe_servers'] | first) }}
+        item_pxe_cfg_dir: >-
+          {{ hostvars[item_pxe_server].pxe_hosts_cfg_dir }}
 
     - name: define | Show OS install config
       debug:
         var: _os_install
 
   when: inventory_hostname in groups['servers']
+
+- block:
+    - name: images | Define pxe OS config
+      set_fact:
+        _pxe_os: >-
+          {{ cur_os | combine(
+                { 'name' : cur_os_name
+                , 'checksum_url'  : cur_os.url + '/' + cur_os.checksum_fn
+                , 'checksum_dir'  : os_checksum_dir
+                , 'checksum_file' : os_checksum_dir + '/' + cur_os.checksum_fn
+                , 'pxe_dir'       : os_pxe_dir
+                , 'pxe_kernel'    : os_pxe_dir + '/' + cur_os.iso_kernel | basename
+                , 'pxe_initrd'    : os_pxe_dir + '/' + cur_os.iso_initrd | basename
+                }
+              )
+          }}
+      vars:
+        cur_os_name: >-
+          {{ _os_install['os'] }}
+        cur_os: >-
+          {{ pxe_os[cur_os_name] }}
+        os_checksum_dir: >-
+          {{ images_checksum_dir + '/' + cur_os_name }}
+        os_pxe_dir: >-
+          {{ cur_os_name + '-huy' }}
+
+    - name: images | Show pxe OS config
+      debug:
+        var: _pxe_os
 

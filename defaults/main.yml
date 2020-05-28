@@ -1,14 +1,6 @@
 ---
 # defaults file for bh-auto-install
 
-# Root directory, where pxe images, pxelinux config and other stuff is
-# located.
-pxe_dir: "/srv/tftp"
-
-# Path to hosts pxe config. It should be included somewhere in
-# `pxelinux.cfg/default`.
-pxelinux_host_cfg: "{{ pxe_dir + '/pxelinux.cfg/hosts.cfg' }}"
-
 # Generate full pxe menu block (if enabled) or just menu items (require `MENU
 # BEGIN` and `MENU END` in main pxe config).
 pxe_full_menu: no
@@ -51,24 +43,28 @@ pxe_os:
       , 'url' : 'https://mirror.yandex.ru/centos/6/isos/x86_64'
       , 'checksum_fn': 'sha256sum.txt.asc'
       , 'checksum_iso_name_rx': '(?<=  )CentOS-6\.[0-9]+-x86_64-netinstall\.iso$'
-      , 'kernel': 'images/pxeboot/vmlinuz'
-      , 'initrd': 'images/pxeboot/initrd.img'
+      , 'iso_kernel': 'images/pxeboot/vmlinuz'
+      , 'iso_initrd': 'images/pxeboot/initrd.img'
       }
   , 'centos7' :
       { 'desc': 'CentOS 7'
       , 'url' : 'https://mirror.yandex.ru/centos/7/isos/x86_64'
       , 'checksum_fn' : 'sha256sum.txt.asc'
       , 'checksum_iso_name_rx': '(?<=  )CentOS-7-x86_64-NetInstall-[0-9]+\.iso$'
-      , 'kernel': 'images/pxeboot/vmlinuz'
-      , 'initrd': 'images/pxeboot/initrd.img'
+      , 'iso_kernel': 'images/pxeboot/vmlinuz'
+      , 'iso_initrd': 'images/pxeboot/initrd.img'
       }
   , 'centos8' :
       { 'desc': 'CentOS 8'
       , 'url' : 'https://mirror.yandex.ru/centos/8/isos/x86_64'
       , 'checksum_fn': 'CHECKSUM'
       , 'checksum_iso_name_rx': '(?<=SHA256 \()CentOS-8\.[0-9]+\.[0-9]+-x86_64-boot\.iso(?=\) = )'
-      , 'kernel': 'images/pxeboot/vmlinuz'
-      , 'initrd': 'images/pxeboot/initrd.img'
+      , 'iso_kernel': 'images/pxeboot/vmlinuz'
+      , 'iso_initrd': 'images/pxeboot/initrd.img'
       }
   }
+
+# 'pxe_hosts_cfg_dir' : Path, where to store hosts pxe configs (on
+# `pxe_server`). They'll be later assembled into `pxelinux_host_cfg` as
+# `Hosts` submenu.
 

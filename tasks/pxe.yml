@@ -7,13 +7,13 @@
 - block:
     - name: pxe | Ensure hosts config directory exists
       file:
-        dest:   "{{ pxe_hosts_cfg_dir }}"
+        dest:   "{{ _host_conf['pxe_cfg_dir'] }}"
         state:  directory
 
     - name: pxe | Copy header and footer configs (for full menu)
       copy:
         src:    "{{ item }}"
-        dest:   "{{ pxe_hosts_cfg_dir + '/' + item | basename }}"
+        dest:   "{{ _host_conf['pxe_cfg_dir'] + '/' + item | basename }}"
         owner:  root
         group:  root
         mode:   0640
@@ -26,7 +26,7 @@
 
     - name: pxe | Or delete header and footer configs (if menu items only)
       file:
-        dest:   "{{ pxe_hosts_cfg_dir + '/' + item | basename }}"
+        dest:   "{{ _host_conf['pxe_cfg_dir'] + '/' + item | basename }}"
         state:  absent
       loop:
         - "pxelinux/00_pxelinux_header.cfg"
@@ -34,7 +34,7 @@
       when: not pxe_full_menu
 
   delegate_to: >-
-    {{ pxe_server if inventory_hostname in groups['servers']
+    {{ _host_conf['pxe_server'] if inventory_hostname in groups['servers']
         else inventory_hostname }}
 
 - block:
@@ -56,11 +56,14 @@
 
     - name: pxe | Generate Hosts menu
       assemble:
-        src: "{{ pxe_hosts_cfg_dir }}"
+        src: "{{ _host_conf['pxe_cfg_dir'] }}"
         regexp: "[0-9]_[^/]+\\.cfg$"
-        dest: "{{ pxelinux_host_cfg }}"
+        dest: "{{ hostvars[cur_pxe_server].pxe_hosts_cfg }}"
+      vars:
+        cur_pxe_server: >-
+          {{ _host_conf['pxe_server'] }}
       when: pxe_hosts_added.changed or pxe_hosts_deleted.changed
 
   when: inventory_hostname in groups['servers']
-  delegate_to: "{{ pxe_server }}"
+  delegate_to: "{{ _host_conf['pxe_server'] }}"
 
