@@ -3,7 +3,7 @@
 - block:
     - name: define | Define OS install config
       set_fact:
-        _os_install: >-
+        _host_conf: >-
           {{  { 'raid': default_raid
               , 'lvm' : default_lvm
               , 'vg_name' : item_name
@@ -54,7 +54,7 @@
 
     - name: define | Show OS install config
       debug:
-        var: _os_install
+        var: _host_conf
 
   when: inventory_hostname in groups['servers']
 
@@ -75,7 +75,7 @@
           }}
       vars:
         cur_os_name: >-
-          {{ _os_install['os'] }}
+          {{ _host_conf['os'] }}
         cur_os: >-
           {{ pxe_os[cur_os_name] }}
         os_checksum_dir: >-

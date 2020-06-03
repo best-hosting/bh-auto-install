@@ -43,13 +43,13 @@
         src:  "pxelinux_host.cfg"
         force:  yes
         backup: yes
-        dest: "{{ _os_install.pxe_cfg }}"
+        dest: "{{ _host_conf.pxe_cfg }}"
       register: pxe_hosts_added
       when: inventory_hostname in groups['new']
 
     - name: pxe | Delete configs for installed hosts
       file:
-        dest: "{{ _os_install.pxe_cfg }}"
+        dest: "{{ _host_conf.pxe_cfg }}"
         state: absent
       register: pxe_hosts_deleted
       when: inventory_hostname in groups['installed']

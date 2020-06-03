@@ -25,7 +25,7 @@
           }}
       vars:
         cur_pxe_dir: >-
-          {{ hostvars[_os_install['pxe_server']].pxe_root_dir }}
+          {{ hostvars[_host_conf['pxe_server']].pxe_root_dir }}
         cur_iso_dest: >-
           {{ cur_pxe_dir + '/' + _pxe_os.pxe_dir }}
         cur_iso_name: >-
@@ -58,5 +58,5 @@
         files:  "{{ _os_iso.os_files }}"
         force:  true
 
-  delegate_to: "{{ _os_install['pxe_server'] }}"
+  delegate_to: "{{ _host_conf['pxe_server'] }}"
 

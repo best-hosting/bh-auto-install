@@ -2,7 +2,7 @@
 # vars file for bh-auto-install
 
 # Internal os_install .
-_os_install: {}
+_host_conf: {}
 
 images_checksum_dir: "{{ playbook_dir + '/image_checksums' }}"
 

@@ -5,8 +5,8 @@ nl='
 '
 OIFS="$IFS"
 
-ip="{{ _os_install.net[0].ip | ipaddr('address') }}"
-alias_ips="{{ _os_install.net[1:] | map(attribute='ip') | map('ipaddr', 'address') | join(' ') }}"
+ip="{{ _host_conf.net[0].ip | ipaddr('address') }}"
+alias_ips="{{ _host_conf.net[1:] | map(attribute='ip') | map('ipaddr', 'address') | join(' ') }}"
 
 IFS="$nl"
 set -- $(grep -l -r -F -e "$ip" /etc/sysconfig/network-scripts/ifcfg-*)
