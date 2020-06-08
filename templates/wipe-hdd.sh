@@ -8,6 +8,7 @@ for d in {{ ['/dev'] | product (_install_conf.disks) | map('join', '/') | join('
         fi
         dd if=/dev/zero of="$d" bs=512 count=65536
         dd if=/dev/zero of="$d" bs=512 count=65536 seek="$sk"
+        hdparm -z "$d" || true
 done
 
 ### sh: Wipe beginning and end of disk END
