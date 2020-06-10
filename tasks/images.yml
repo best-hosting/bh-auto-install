@@ -17,6 +17,8 @@
       set_fact:
         _os_iso: >-
           {{ { 'iso_name'  : cur_iso_name
+             , 'iso_hash'  : cur_iso_hash
+             , 'iso_hash_type' : _pxe_os.checksum_type
              , 'iso_url'   : _pxe_os.url + '/' + cur_iso_name
              , 'iso_dest'  : cur_iso_dest
              , 'iso_file'  : cur_iso_dest + '/' + cur_iso_name
@@ -28,9 +30,32 @@
           {{ hostvars[_host_conf['pxe_server']].pxe_root_dir }}
         cur_iso_dest: >-
           {{ cur_pxe_dir + '/' + _pxe_os.pxe_dir }}
+        checksum_data: >-
+          {{ lookup('file', _pxe_os.checksum_file) }}
         cur_iso_name: >-
-          {{ lookup('file', _pxe_os.checksum_file)
+          {{ checksum_data
                 | regex_search(_pxe_os.checksum_iso_name_rx, multiline=true)
+          }}
+        # Hashes are effectively indexed by filenames, thus i need to use
+        # (already known from above) filename to find _correct_ row, where to
+        # parse hash. Thus, user's 'checksum_rx' should only parse hash from
+        # _correct_ row (i.e. it should not bother with identifying correct
+        # row). The reason is that to identify correct row in 'checksum_rx'
+        # i'll need to use lookahead/lookbehind assertions and then match with
+        # hash only. But lookbehind assertions does not allow variable width
+        # regexps. Thus, when hash is _after_ filename, it won't be possible
+        # in user's 'checksum_rx' to identify correct row at all.
+        #
+        # On the other hand, in some stupid checksum file formats correct
+        # filename may match multiple times, so i select them all. And then
+        # user's 'checksum_rx' must match _only one_ of them, so include there
+        # some guards against false matches.
+        cur_iso_hash: >-
+          {{ checksum_data
+                | regex_findall('^.*\b' + cur_iso_name + '\b.*$', multiline=true)
+                | map('regex_search', _pxe_os.checksum_rx, multiline=true)
+                | reject('none')
+                | list | first
           }}
 
     - name: images | Show OS image definitions
@@ -45,11 +70,20 @@
         name: "{{ _os_iso.iso_dest }}"
         state: directory
 
+    - name: image (pxe_server) | Stat iso image
+      stat:
+        path: "{{ _os_iso.iso_file }}"
+        checksum_algorithm: "{{ _os_iso.iso_hash_type }}"
+        get_checksum: true
+      register: iso_file_stats
+
     - name: images (pxe_server) | Download iso
       get_url:
         url:  "{{ _os_iso.iso_url }}"
         dest: "{{ _os_iso.iso_file }}"
-        force: no
+        checksum: "{{ _os_iso.iso_hash_type + ':' + _os_iso.iso_hash }}"
+        force: true
+      when: not iso_file_stats.stat.exists or iso_file_stats.stat.checksum != _os_iso.iso_hash
 
     - name: images (pxe_server) | Extract kernel and initrd
       iso_extract:
