@@ -19,8 +19,8 @@
                     , 'pxe_server'  : item_pxe_server
                     , 'pxe_cfg_dir' : item_pxe_cfg_dir
                     , 'pxe_cfg' : item_pxe_cfg_dir + '/50_' + item_name + '.cfg'
-                    , 'ks_cfg'  : ks_www_root + '/' + item_name + '.cfg'
-                    , 'ks_www'  : 'http://' + ks_www_addr + '/' + item_name + '.cfg'
+                    , 'ks_cfg'  : hostvars[item_ks_server].ks_www_root + '/' + item_name + '.cfg'
+                    , 'ks_www'  : hostvars[item_ks_server].ks_www_addr + '/' + item_name + '.cfg'
                     , 'net'     : item_net
                     }
                   )
@@ -51,6 +51,8 @@
           {{ os_install.pxe_server | default(groups['pxe_servers'] | first) }}
         item_pxe_cfg_dir: >-
           {{ hostvars[item_pxe_server].pxe_hosts_cfg_dir }}
+        item_ks_server: >-
+          {{ os_install.ks_server | default(groups['ks_servers'] | first) }}
 
     - name: define | Show OS install config
       debug:
