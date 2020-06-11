@@ -16,23 +16,23 @@
     - name: images (localhost) | Read checksum file
       set_fact:
         _os_iso: >-
-          {{ { 'iso_name'  : cur_iso_name
-             , 'iso_hash'  : cur_iso_hash
-             , 'iso_hash_type' : _pxe_os.checksum_type
-             , 'iso_url'   : _pxe_os.url + '/' + cur_iso_name
-             , 'iso_dest'  : cur_iso_dest
-             , 'iso_file'  : cur_iso_dest + '/' + cur_iso_name
-             , 'os_files'  : [_pxe_os.iso_kernel, _pxe_os.iso_initrd]
+          {{ { 'name'     : cur_name
+             , 'file'     : cur_dest_dir + '/' + cur_name
+             , 'hash'     : cur_hash
+             , 'hash_type': _pxe_os.checksum_type
+             , 'url'      : _pxe_os.url + '/' + cur_name
+             , 'dest_dir' : cur_dest_dir
+             , 'os_files' : [_pxe_os.iso_kernel, _pxe_os.iso_initrd]
              }
           }}
       vars:
         cur_pxe_dir: >-
           {{ hostvars[_host_conf['pxe_server']].pxe_root_dir }}
-        cur_iso_dest: >-
+        cur_dest_dir: >-
           {{ cur_pxe_dir + '/' + _pxe_os.pxe_dir }}
         checksum_data: >-
           {{ lookup('file', _pxe_os.checksum_file) }}
-        cur_iso_name: >-
+        cur_name: >-
           {{ checksum_data
                 | regex_search(_pxe_os.checksum_iso_name_rx, multiline=true)
           }}
@@ -50,9 +50,9 @@
         # filename may match multiple times, so i select them all. And then
         # user's 'checksum_rx' must match _only one_ of them, so include there
         # some guards against false matches.
-        #cur_iso_hash: >-
+        #cur_hash: >-
         #  {{ checksum_data
-        #        | regex_findall('^.*\b' + cur_iso_name + '\b.*$', multiline=true)
+        #        | regex_findall('^.*\b' + cur_name + '\b.*$', multiline=true)
         #        | map('regex_search', _pxe_os.checksum_rx, multiline=true)
         #        | reject('none')
         #        | list | first
@@ -62,7 +62,7 @@
         # using lookahead assertion, and then select entire row. In that case
         # i rely on 'checksum_iso_name_rx' to match only _single_ row of
         # checksum file.
-        cur_iso_hash: >-
+        cur_hash: >-
           {{ checksum_data
                 | regex_search('^(?=.*' + _pxe_os.checksum_iso_name_rx + ').*$', multiline=true)
                 | regex_search(_pxe_os.checksum_rx, multiline=true)
@@ -77,28 +77,28 @@
 - block:
     - name: images (pxe_server) | Create image checksum directories
       file:
-        name: "{{ _os_iso.iso_dest }}"
+        name: "{{ _os_iso.dest_dir }}"
         state: directory
 
     - name: image (pxe_server) | Stat iso image
       stat:
-        path: "{{ _os_iso.iso_file }}"
-        checksum_algorithm: "{{ _os_iso.iso_hash_type }}"
+        path: "{{ _os_iso.file }}"
+        checksum_algorithm: "{{ _os_iso.hash_type }}"
         get_checksum: true
       register: iso_file_stats
 
     - name: images (pxe_server) | Download iso
       get_url:
-        url:  "{{ _os_iso.iso_url }}"
-        dest: "{{ _os_iso.iso_file }}"
-        checksum: "{{ _os_iso.iso_hash_type + ':' + _os_iso.iso_hash }}"
+        url:  "{{ _os_iso.url }}"
+        dest: "{{ _os_iso.file }}"
+        checksum: "{{ _os_iso.hash_type + ':' + _os_iso.hash }}"
         force: true
-      when: not iso_file_stats.stat.exists or iso_file_stats.stat.checksum != _os_iso.iso_hash
+      when: not iso_file_stats.stat.exists or iso_file_stats.stat.checksum != _os_iso.hash
 
     - name: images (pxe_server) | Extract kernel and initrd
       iso_extract:
-        image:  "{{ _os_iso.iso_file }}"
-        dest:   "{{ _os_iso.iso_dest }}"
+        image:  "{{ _os_iso.file }}"
+        dest:   "{{ _os_iso.dest_dir }}"
         files:  "{{ _os_iso.os_files }}"
         force:  true
 
