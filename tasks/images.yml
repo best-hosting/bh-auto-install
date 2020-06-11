@@ -50,12 +50,22 @@
         # filename may match multiple times, so i select them all. And then
         # user's 'checksum_rx' must match _only one_ of them, so include there
         # some guards against false matches.
+        #cur_iso_hash: >-
+        #  {{ checksum_data
+        #        | regex_findall('^.*\b' + cur_iso_name + '\b.*$', multiline=true)
+        #        | map('regex_search', _pxe_os.checksum_rx, multiline=true)
+        #        | reject('none')
+        #        | list | first
+        #  }}
+        #
+        # Or i may use entire 'checksum_iso_name_rx' to identify correct row
+        # using lookahead assertion, and then select entire row. In that case
+        # i rely on 'checksum_iso_name_rx' to match only _single_ row of
+        # checksum file.
         cur_iso_hash: >-
           {{ checksum_data
-                | regex_findall('^.*\b' + cur_iso_name + '\b.*$', multiline=true)
-                | map('regex_search', _pxe_os.checksum_rx, multiline=true)
-                | reject('none')
-                | list | first
+                | regex_search('^(?=.*' + _pxe_os.checksum_iso_name_rx + ').*$', multiline=true)
+                | regex_search(_pxe_os.checksum_rx, multiline=true)
           }}
 
     - name: images | Show OS image definitions
