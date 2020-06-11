@@ -18,10 +18,12 @@
         _os_iso: >-
           {{ { 'name'     : cur_name
              , 'file'     : cur_dest_dir + '/' + cur_name
+             , 'type'     : _pxe_os.iso_type
              , 'hash'     : cur_hash
              , 'hash_type': _pxe_os.checksum_type
              , 'url'      : _pxe_os.url + '/' + cur_name
              , 'dest_dir' : cur_dest_dir
+             , 'extract_dir': cur_dest_dir + '/' + cur_name | regex_search('^[^.]+(?=\.)')
              , 'os_files' : [_pxe_os.iso_kernel, _pxe_os.iso_initrd]
              }
           }}
@@ -75,19 +77,19 @@
   delegate_to: localhost
 
 - block:
-    - name: images (pxe_server) | Create image checksum directories
+    - name: images (pxe_server) | Create image directory
       file:
         name: "{{ _os_iso.dest_dir }}"
         state: directory
 
-    - name: image (pxe_server) | Stat iso image
+    - name: image (pxe_server) | Stat image
       stat:
         path: "{{ _os_iso.file }}"
         checksum_algorithm: "{{ _os_iso.hash_type }}"
         get_checksum: true
       register: iso_file_stats
 
-    - name: images (pxe_server) | Download iso
+    - name: images (pxe_server) | Download image
       get_url:
         url:  "{{ _os_iso.url }}"
         dest: "{{ _os_iso.file }}"
@@ -95,12 +97,38 @@
         force: true
       when: not iso_file_stats.stat.exists or iso_file_stats.stat.checksum != _os_iso.hash
 
-    - name: images (pxe_server) | Extract kernel and initrd
+  delegate_to: "{{ _host_conf['pxe_server'] }}"
+
+- block:
+    - name: images (pxe_server) | Extract kernel and initrd from iso
       iso_extract:
         image:  "{{ _os_iso.file }}"
         dest:   "{{ _os_iso.dest_dir }}"
         files:  "{{ _os_iso.os_files }}"
         force:  true
 
+  when: _os_iso.type == 'iso'
+  delegate_to: "{{ _host_conf['pxe_server'] }}"
+
+- block:
+    - name: images (pxe_server) | Create image archive extract directory
+      file:
+        name: "{{ _os_iso.extract_dir }}"
+        state: directory
+
+    - name: images (pxe_server) | Extract image archive
+      unarchive:
+        src:    "{{ _os_iso.file }}"
+        dest:   "{{ _os_iso.extract_dir }}"
+        remote_src: yes
+
+    - name: images (pxe_server) | Copy kernel and initrd from archive
+      copy:
+        src:    "{{ _os_iso.extract_dir + '/' + item }}"
+        dest:   "{{ _os_iso.dest_dir }}"
+        remote_src: yes
+      loop: "{{ _os_iso.os_files }}"
+
+  when: _os_iso.type == 'archive'
   delegate_to: "{{ _host_conf['pxe_server'] }}"
 

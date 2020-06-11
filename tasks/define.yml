@@ -65,25 +65,27 @@
       set_fact:
         _pxe_os: >-
           {{ cur_os | combine(
-                { 'name' : cur_os_name
-                , 'checksum_url'  : cur_os.url + '/' + cur_os.checksum_fn
-                , 'checksum_dir'  : os_checksum_dir
-                , 'checksum_file' : os_checksum_dir + '/' + cur_os.checksum_fn
-                , 'pxe_dir'       : os_pxe_dir
-                , 'pxe_kernel'    : os_pxe_dir + '/' + cur_os.iso_kernel | basename
-                , 'pxe_initrd'    : os_pxe_dir + '/' + cur_os.iso_initrd | basename
+                { 'name' : cur_name
+                , 'checksum_url'  : cur_checksum_url
+                , 'checksum_dir'  : cur_checksum_dir
+                , 'checksum_file' : cur_checksum_dir + '/' + cur_os.checksum_fn
+                , 'pxe_dir'       : cur_pxe_dir
+                , 'pxe_kernel'    : cur_pxe_dir + '/' + cur_os.iso_kernel | basename
+                , 'pxe_initrd'    : cur_pxe_dir + '/' + cur_os.iso_initrd | basename
                 }
               )
           }}
       vars:
-        cur_os_name: >-
+        cur_name: >-
           {{ _host_conf['os'] }}
         cur_os: >-
-          {{ pxe_os[cur_os_name] }}
-        os_checksum_dir: >-
-          {{ images_checksum_dir + '/' + cur_os_name }}
-        os_pxe_dir: >-
-          {{ cur_os_name + '-huy' }}
+          {{ pxe_os[cur_name] }}
+        cur_checksum_url: >-
+          {{ cur_os.checksum_url | default(cur_os.url) + '/' + cur_os.checksum_fn }}
+        cur_checksum_dir: >-
+          {{ images_checksum_dir + '/' + cur_name }}
+        cur_pxe_dir: >-
+          {{ cur_name + '-huy' }}
 
     - name: images | Show pxe OS config
       debug:
