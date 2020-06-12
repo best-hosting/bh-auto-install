@@ -62,7 +62,7 @@
       vars:
         cur_pxe_server: >-
           {{ _host_conf['pxe_server'] }}
-      when: pxe_hosts_added.changed or pxe_hosts_deleted.changed
+      when: force_overwrite or pxe_hosts_added.changed or pxe_hosts_deleted.changed
 
   when: inventory_hostname in groups['servers']
   delegate_to: "{{ _host_conf['pxe_server'] }}"

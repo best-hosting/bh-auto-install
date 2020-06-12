@@ -131,3 +131,4 @@ pxe_os:
 # `pxe_server`). They'll be later assembled into `pxelinux_host_cfg` as
 # `Hosts` submenu.
 
+force_overwrite: false
