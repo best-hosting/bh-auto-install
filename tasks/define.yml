@@ -21,7 +21,6 @@
                     , 'pxe_cfg' : item_pxe_cfg_dir + '/50_' + item_name + '.cfg'
                     , 'ks_cfg'  : hostvars[item_ks_server].ks_www_root + '/' + item_name + '.cfg'
                     , 'ks_www'  : hostvars[item_ks_server].ks_www_addr + '/' + item_name + '.cfg'
-                    , 'net'     : item_net
                     }
                   )
           }}
@@ -30,6 +29,18 @@
           {{ os_install.name | default(inventory_hostname) }}
         item_raid: >-
           {{ os_install.raid | default(default_raid) }}
+        item_pxe_server: >-
+          {{ os_install.pxe_server | default(groups['pxe_servers'] | first) }}
+        item_pxe_cfg_dir: >-
+          {{ hostvars[item_pxe_server].pxe_hosts_cfg_dir }}
+        item_ks_server: >-
+          {{ os_install.ks_server | default(groups['ks_servers'] | first) }}
+
+    - name: define | Define OS install network config
+      set_fact:
+        _host_conf: >-
+          {{  _host_conf | combine({'net' : item_net}) }}
+      vars:
         item_ip0_network: >-
           {{ os_install.net[0].ip | ipaddr('network') }}
         def_ip0: >-
@@ -47,12 +58,7 @@
           }}
         item_net: >-
           {{ [def_ip0 | combine(os_install.net[0])] + os_install.net[1:] }}
-        item_pxe_server: >-
-          {{ os_install.pxe_server | default(groups['pxe_servers'] | first) }}
-        item_pxe_cfg_dir: >-
-          {{ hostvars[item_pxe_server].pxe_hosts_cfg_dir }}
-        item_ks_server: >-
-          {{ os_install.ks_server | default(groups['ks_servers'] | first) }}
+      when: os_install.net is defined
 
     - name: define | Show OS install config
       debug:
