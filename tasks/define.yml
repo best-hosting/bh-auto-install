@@ -14,6 +14,8 @@
                                 ])
                               )
               , 'disks' : ['sda', 'sdb'] if item_raid else ['sda']
+              , 'gen_ks' : true
+              , 'gen_pxe_host' : true
               } | combine(os_install,
                     { 'name'    : item_name
                     , 'pxe_server'  : item_pxe_server

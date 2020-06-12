@@ -11,13 +11,14 @@
         backup: no
         mode: 0755
         dest: "{{ _host_conf.ks_cfg }}"
-      when: inventory_hostname in groups['new']
+      when: _host_conf.gen_ks and inventory_hostname in groups['new']
 
     - name: kickstart | Delete config for _already_ installed hosts
       file:
         dest: "{{ _host_conf.ks_cfg }}"
         state: absent
-      when: inventory_hostname in groups['installed']
+      when: not _host_conf.gen_ks or inventory_hostname in groups['installed']
 
+  when: inventory_hostname in groups['servers']
   delegate_to: "{{ kickstart_server }}"
 

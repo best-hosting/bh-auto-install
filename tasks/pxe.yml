@@ -33,6 +33,7 @@
         - "pxelinux/99_pxelinux_footer.cfg"
       when: not pxe_full_menu
 
+  when: _host_conf.gen_pxe_host
   delegate_to: >-
     {{ _host_conf['pxe_server'] if inventory_hostname in groups['servers']
         else inventory_hostname }}
@@ -45,14 +46,14 @@
         backup: yes
         dest: "{{ _host_conf.pxe_cfg }}"
       register: pxe_hosts_added
-      when: inventory_hostname in groups['new']
+      when: _host_conf.gen_pxe_host and inventory_hostname in groups['new']
 
     - name: pxe | Delete configs for installed hosts
       file:
         dest: "{{ _host_conf.pxe_cfg }}"
         state: absent
       register: pxe_hosts_deleted
-      when: inventory_hostname in groups['installed']
+      when: not _host_conf.gen_pxe_host or inventory_hostname in groups['installed']
 
     - name: pxe | Generate Hosts menu
       assemble:
