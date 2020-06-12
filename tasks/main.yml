@@ -7,9 +7,13 @@
 
 - name: Configure pxe.
   import_tasks: pxe.yml
+  tags:
+    - pxe
 
 - name: Configure kickstart.
-  include_tasks: kickstart.yml
+  import_tasks: kickstart.yml
+  tags:
+    - kickstart
 
 - name: Update pxe images
   import_tasks: images.yml
