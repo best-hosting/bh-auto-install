@@ -29,7 +29,7 @@
           }}
       vars:
         cur_pxe_dir: >-
-          {{ hostvars[_host_conf['pxe_server']].pxe_root_dir }}
+          {{ hostvars[_pxe_server].pxe_root_path }}
         cur_dest_dir: >-
           {{ cur_pxe_dir + '/' + _pxe_os.pxe_dir }}
         checksum_data: >-
@@ -134,7 +134,7 @@
           loop: "{{ _os_iso.os_files }}"
 
       when: _os_iso.type == 'archive'
-      delegate_to: "{{ _host_conf['pxe_server'] }}"
+      delegate_to: "{{ _pxe_server }}"
 
     - block:
         - name: images (pxe_server) | Find all images
@@ -153,5 +153,5 @@
           when: item.path != _os_iso.file
           loop: "{{ image_files.files }}"
 
-  delegate_to: "{{ _host_conf['pxe_server'] }}"
+  delegate_to: "{{ _pxe_server }}"
 

@@ -5,41 +5,34 @@
 # are _ignored_.
 
 - block:
-    - name: pxe | Ensure hosts config directory exists
+    - name: pxe | Ensure directories for pxe configs exist
       file:
-        dest:   "{{ _host_conf['pxe_cfg_dir'] }}"
+        dest:   "{{ item }}"
         state:  directory
+      loop:
+        - "{{ hosts_pxe_menu_cfg_d }}"
+        - "{{ _pxe_os.pxe_menu_cfg_d }}"
 
-    - name: pxe | Copy header and footer configs (for full menu)
-      copy:
-        src:    "{{ item }}"
-        dest:   "{{ _host_conf['pxe_cfg_dir'] + '/' + item | basename }}"
-        owner:  root
-        group:  root
-        mode:   0640
+    - name: pxe | Create config for host OS
+      template:
+        src:  "pxe_os.cfg"
         force:  yes
-        backup: no
-      loop:
-        - "pxelinux/00_pxelinux_header.cfg"
-        - "pxelinux/99_pxelinux_footer.cfg"
-      when: pxe_full_menu
+        backup: yes
+        dest: "{{ _pxe_os.pxe_cfg }}"
+      register: pxe_os_added
 
-    - name: pxe | Or delete header and footer configs (if menu items only)
-      file:
-        dest:   "{{ _host_conf['pxe_cfg_dir'] + '/' + item | basename }}"
-        state:  absent
-      loop:
-        - "pxelinux/00_pxelinux_header.cfg"
-        - "pxelinux/99_pxelinux_footer.cfg"
-      when: not pxe_full_menu
+    - name: pxe | Generate OS menu
+      assemble:
+        src: "{{ _pxe_os.pxe_menu_cfg_d }}"
+        regexp: "[0-9]_[^/]+\\.cfg$"
+        dest: >-
+          {{ hostvars[_pxe_server].pxe_root_path
+              + '/' + hostvars[_pxe_server].pxelinux_incl_dir
+              + '/' + _pxe_os.pxe_menu_cfg
+          }}
+      when: force_overwrite or pxe_os_added.changed
 
-  when: _host_conf.gen_pxe_host
-  delegate_to: >-
-    {{ _host_conf['pxe_server'] if inventory_hostname in groups['servers']
-        else inventory_hostname }}
-
-- block:
-    - name: pxe | Create config for new hosts
+    - name: pxe | Create config for new host
       template:
         src:  "pxe_host.cfg"
         force:  yes
@@ -48,7 +41,7 @@
       register: pxe_hosts_added
       when: _host_conf.gen_pxe_host and inventory_hostname in groups['new']
 
-    - name: pxe | Delete configs for installed hosts
+    - name: pxe | Or delete config for installed host
       file:
         dest: "{{ _host_conf.pxe_cfg }}"
         state: absent
@@ -57,14 +50,63 @@
 
     - name: pxe | Generate Hosts menu
       assemble:
-        src: "{{ _host_conf['pxe_cfg_dir'] }}"
+        src: "{{ hosts_pxe_menu_cfg_d }}"
         regexp: "[0-9]_[^/]+\\.cfg$"
-        dest: "{{ hostvars[cur_pxe_server].pxe_hosts_menu_cfg }}"
-      vars:
-        cur_pxe_server: >-
-          {{ _host_conf['pxe_server'] }}
+        dest: >-
+          {{ hostvars[_pxe_server].pxe_root_path
+              + '/' + hostvars[_pxe_server].pxelinux_incl_dir
+              + '/' + hosts_pxe_menu_cfg
+          }}
       when: force_overwrite or pxe_hosts_added.changed or pxe_hosts_deleted.changed
 
+    - name: pxe | Add menus to main pxelinux config
+      blockinfile:
+        marker: '# {mark} bh-auto-install ANSIBLE MANAGED BLOCK'
+        state: present
+        dest: >-
+          {{ hostvars[_pxe_server].pxe_root_path + '/' + hostvars[_pxe_server].pxelinux_cfg }}
+        block: |
+
+            MENU BEGIN Hosts
+            MENU LABEL ^Hosts
+            MENU ROWS 5
+
+            LABEL
+                    MENU LABEL ..
+                    MENU EXIT
+
+            INCLUDE {{ _host_conf.pxe_menu_cfg }}
+
+            MENU END Hosts
+
+            MENU SEPARATOR
+
+            {% for menu in pxe_menus %}
+
+            MENU BEGIN {{ menu }}
+            MENU LABEL ^{{ menu }}
+            MENU ROWS 5
+
+            LABEL
+                    MENU LABEL ..
+                    MENU EXIT
+
+              {% for menu_cfg in pxe_os.values()
+                                    | selectattr('pxe_menu', 'equalto', menu)
+                                    | map(attribute='pxe_menu_cfg')
+                                    | unique %}
+
+            INCLUDE {{ menu_cfg }}
+
+              {% endfor %}
+
+            MENU END {{ menu }}
+
+            {% endfor %}
+      vars:
+        pxe_menus: >-
+          {{ pxe_os.values() | map(attribute='pxe_menu') | unique | list }}
+
   when: inventory_hostname in groups['servers']
-  delegate_to: "{{ _host_conf['pxe_server'] }}"
+  delegate_to: "{{ _pxe_server }}"
 

@@ -1,10 +1,6 @@
 ---
 # defaults file for bh-auto-install
 
-# Generate full pxe menu block (if enabled) or just menu items (require `MENU
-# BEGIN` and `MENU END` in main pxe config).
-pxe_full_menu: no
-
 # Whether to build raid by default.
 default_raid: false
 
@@ -43,6 +39,8 @@ pxe_os:
       , 'iso_kernel': 'images/pxeboot/vmlinuz'
       , 'iso_initrd': 'images/pxeboot/initrd.img'
       , 'iso_type': 'iso'
+      , 'pxe_menu': 'CentOS-huy'
+      , 'pxe_menu_cfg': 'centos.cfg'
       }
   , 'centos7' :
       { 'desc': 'CentOS 7'
@@ -55,6 +53,8 @@ pxe_os:
       , 'iso_kernel': 'images/pxeboot/vmlinuz'
       , 'iso_initrd': 'images/pxeboot/initrd.img'
       , 'iso_type': 'iso'
+      , 'pxe_menu': 'CentOS-huy'
+      , 'pxe_menu_cfg': 'centos.cfg'
       }
   , 'centos8' :
       { 'desc': 'CentOS 8'
@@ -67,6 +67,8 @@ pxe_os:
       , 'iso_kernel': 'images/pxeboot/vmlinuz'
       , 'iso_initrd': 'images/pxeboot/initrd.img'
       , 'iso_type': 'iso'
+      , 'pxe_menu': 'CentOS-huy'
+      , 'pxe_menu_cfg': 'centos.cfg'
       }
   , 'debian6' :
       { 'desc': 'Debian 6 (squeeze)'
@@ -80,6 +82,8 @@ pxe_os:
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
       , 'iso_type': 'archive'
+      , 'pxe_menu': 'Debian-huy'
+      , 'pxe_menu_cfg': 'debian.cfg'
       }
   , 'debian7' :
       { 'desc': 'Debian 7 (wheezy)'
@@ -93,6 +97,8 @@ pxe_os:
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
       , 'iso_type': 'archive'
+      , 'pxe_menu': 'Debian-huy'
+      , 'pxe_menu_cfg': 'debian.cfg'
       }
   , 'debian8' :
       { 'desc': 'Debian 8 (jessie)'
@@ -106,6 +112,8 @@ pxe_os:
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
       , 'iso_type': 'archive'
+      , 'pxe_menu': 'Debian-huy'
+      , 'pxe_menu_cfg': 'debian.cfg'
       }
   , 'debian9' :
       { 'desc': 'Debian 9 (stretch)'
@@ -119,6 +127,8 @@ pxe_os:
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
       , 'iso_type': 'archive'
+      , 'pxe_menu': 'Debian-huy'
+      , 'pxe_menu_cfg': 'debian.cfg'
       }
   , 'debian10' :
       { 'desc': 'Debian 10 (buster)'
@@ -132,12 +142,19 @@ pxe_os:
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
       , 'iso_type': 'archive'
+      , 'pxe_menu': 'Debian-huy'
+      , 'pxe_menu_cfg': 'debian.cfg'
       }
   }
 
-# 'pxe_hosts_cfg_dir' : Path, where to store hosts pxe configs (on
-# `pxe_server`) generated from 'pxe_host.cfg' template. They'll be later
-# assembled into `pxe_host_cfg` as `Hosts` submenu.
-# 'pxe_hosts_menu_cfg' : pxe menu assembled from all pxe host config.
+# 'pxe_root_path': root path served by tftp server (i.e. accessible for
+# pxelinux).
+# 'pxelinux_cfg' : main pxe config, which 'pxelinux' reads first. Path
+# _relative_ to 'pxe_root_path'.
+# 'pxelinux_incl_dir': directory, where to place assembled pxe menu configs.
+# Path _relative_ to 'pxe_root_path'.
+# 'pxe_cfg_d_path' : Path, where to store hosts and os pxe configs generated
+# from ansible template. They'll be later assembled into 'hosts' and os pxe
+# menus and placed (when assembled) in 'pxelinux_incl_dir'.
 
 force_overwrite: false

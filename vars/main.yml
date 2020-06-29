@@ -10,3 +10,8 @@ _pxe_os: {}
 _os_iso: {}
 
 file_does_not_exist: "{{ '/' + 65534 | random(seed=_host_conf.name) | hash('sha1') }}"
+
+# All hosts should use single pxe config location and single pxe menu config,
+# so i can gather all hosts into single 'Hosts' menu in pxe.
+hosts_pxe_menu_cfg_d: "{{ hostvars[_pxe_server].pxe_cfg_d_path + '/hosts' }}"
+hosts_pxe_menu_cfg: 'hosts.cfg'
