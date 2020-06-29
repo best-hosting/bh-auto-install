@@ -41,7 +41,7 @@
 - block:
     - name: pxe | Create config for new hosts
       template:
-        src:  "pxelinux_host.cfg"
+        src:  "pxe_host.cfg"
         force:  yes
         backup: yes
         dest: "{{ _host_conf.pxe_cfg }}"
@@ -59,7 +59,7 @@
       assemble:
         src: "{{ _host_conf['pxe_cfg_dir'] }}"
         regexp: "[0-9]_[^/]+\\.cfg$"
-        dest: "{{ hostvars[cur_pxe_server].pxe_hosts_cfg }}"
+        dest: "{{ hostvars[cur_pxe_server].pxe_hosts_menu_cfg }}"
       vars:
         cur_pxe_server: >-
           {{ _host_conf['pxe_server'] }}

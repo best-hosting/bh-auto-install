@@ -136,7 +136,8 @@ pxe_os:
   }
 
 # 'pxe_hosts_cfg_dir' : Path, where to store hosts pxe configs (on
-# `pxe_server`). They'll be later assembled into `pxelinux_host_cfg` as
-# `Hosts` submenu.
+# `pxe_server`) generated from 'pxe_host.cfg' template. They'll be later
+# assembled into `pxe_host_cfg` as `Hosts` submenu.
+# 'pxe_hosts_menu_cfg' : pxe menu assembled from all pxe host config.
 
 force_overwrite: false
