@@ -7,6 +7,9 @@ default_raid: false
 # Whether to use lvm by default.
 default_lvm: false
 
+pxe_menu_font: "{{ playbook_dir + '/CyrKoi-Fixed18.psf' }}"
+pxe_splash: "{{ playbook_dir + '/splash.png' }}"
+
 # Dictionary with default settings for particular network indexed by _network_
 # address. It will be queried for 'gw' and 'ns' fields, if they are omitted in
 # element 0 of 'os_install.net' list.  And, because 'gw' and 'ns' fields are
@@ -149,6 +152,7 @@ pxe_os:
 
 # 'pxe_root_path': root path served by tftp server (i.e. accessible for
 # pxelinux).
+# 'tftp_address': address _with port_, on which tftpd server should listen.
 # 'pxelinux_cfg' : main pxe config, which 'pxelinux' reads first. Path
 # _relative_ to 'pxe_root_path'.
 # 'pxelinux_incl_dir': directory, where to place assembled pxe menu configs.

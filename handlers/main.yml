@@ -1,2 +1,6 @@
 ---
 # handlers file for bh-auto-install
+
+- name: restart tftpd
+  service: name=tftpd-hpa state=restarted
+  delegate_to: "{{ _pxe_server }}"
