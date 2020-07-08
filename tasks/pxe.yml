@@ -1,7 +1,7 @@
 ---
 
 - block:
-    - name: pxe | Install tftpd and pxelinux packages
+    - name: pxe (pxe_server) | Install tftpd and pxelinux packages
       package:
         name:
           - 'tftpd-hpa'
@@ -9,7 +9,7 @@
           - 'syslinux-common'
         state: present
 
-    - name: pxe | Ensure pxe directories exist
+    - name: pxe (pxe_server) | Ensure pxe directories exist
       file:
         dest: "{{ item }}"
         state: directory
@@ -20,7 +20,7 @@
       notify:
         - restart tftpd
 
-    - name: pxe | Set pxe root directory in tftp server
+    - name: pxe (pxe_server) | Set pxe root directory in tftp server
       lineinfile:
         path: '/etc/default/tftpd-hpa'
         backup: yes
@@ -29,7 +29,7 @@
       notify:
         - restart tftpd
 
-    - name: pxe | Set tftp server listen address
+    - name: pxe (pxe_server) | Set tftp server listen address
       lineinfile:
         path: '/etc/default/tftpd-hpa'
         backup: yes
@@ -38,7 +38,7 @@
       notify:
         - restart tftpd
 
-    - name: pxe | Copy pxelinux.0
+    - name: pxe (pxe_server) | Copy pxelinux.0
       copy:
         src:  "{{ item }}"
         dest: "{{ hostvars[_pxe_server].pxe_root_path + '/' + item | basename }}"
@@ -46,12 +46,12 @@
       vars:
         item: '/usr/lib/PXELINUX/pxelinux.0'
 
-    - name: pxe | Find syslinux modules
+    - name: pxe (pxe_server) | Find syslinux modules
       find:
         paths: '/usr/lib/syslinux/modules/bios'
       register: syslinux_modules
 
-    - name: pxe | Copy syslinux modules
+    - name: pxe (pxe_server) | Copy syslinux modules
       copy:
         src:  "{{ item.path }}"
         dest: "{{ pxe_modules_path + '/' + item.path | basename }}"
@@ -62,12 +62,12 @@
   tags:
     - install_pxe
 
-# Enforce correct state of kickstart and pxe host configs: create for hosts in
+# Enforce correct state of kickstart and pxe (pxe_server) host configs: create for hosts in
 # `new` group and delete for hosts in `installed` group. Hosts in other groups
 # are _ignored_.
 
 - block:
-    - name: pxe | Ensure directories for pxe configs exist
+    - name: pxe (pxe_server) | Ensure directories for pxe configs exist
       file:
         dest:   "{{ item }}"
         state:  directory
@@ -75,7 +75,7 @@
         - "{{ hosts_pxe_menu_cfg_d }}"
         - "{{ _pxe_os.pxe_menu_cfg_d }}"
 
-    - name: pxe | Create config for host OS
+    - name: pxe (pxe_server) | Create config for host OS
       template:
         src:  "pxe_os.cfg"
         force:  yes
@@ -83,7 +83,7 @@
         dest: "{{ _pxe_os.pxe_cfg }}"
       register: pxe_os_added
 
-    - name: pxe | Generate OS menu
+    - name: pxe (pxe_server) | Generate OS menu
       assemble:
         src: "{{ _pxe_os.pxe_menu_cfg_d }}"
         regexp: "[0-9]_[^/]+\\.cfg$"
@@ -94,7 +94,7 @@
           }}
       when: force_overwrite or pxe_os_added.changed
 
-    - name: pxe | Create config for new host
+    - name: pxe (pxe_server) | Create config for new host
       template:
         src:  "pxe_host.cfg"
         force:  yes
@@ -103,14 +103,14 @@
       register: pxe_hosts_added
       when: _host_conf.gen_pxe_host and inventory_hostname in groups['new']
 
-    - name: pxe | Or delete config for installed host
+    - name: pxe (pxe_server) | Or delete config for installed host
       file:
         dest: "{{ _host_conf.pxe_cfg }}"
         state: absent
       register: pxe_hosts_deleted
       when: not _host_conf.gen_pxe_host or inventory_hostname in groups['installed']
 
-    - name: pxe | Generate Hosts menu
+    - name: pxe (pxe_server) | Generate Hosts menu
       assemble:
         src: "{{ hosts_pxe_menu_cfg_d }}"
         regexp: "[0-9]_[^/]+\\.cfg$"
@@ -125,7 +125,7 @@
   delegate_to: "{{ _pxe_server }}"
 
 - block:
-    - name: pxe | Copy files used in pxelinux config
+    - name: pxe (pxe_server) | Copy files used in pxelinux config
       copy:
         src:  "{{ item }}"
         dest: "{{ hostvars[_pxe_server].pxe_root_path + '/' + item | basename }}"
@@ -133,7 +133,7 @@
         - "{{ pxe_menu_font }}"
         - "{{ pxe_splash }}"
 
-    - name: pxe | Generate main pxelinux config
+    - name: pxe (pxe_server) | Generate main pxelinux config
       template:
         src:  'pxelinux_cfg'
         dest: "{{ hostvars[_pxe_server].pxe_root_path + '/pxelinux.cfg/default' }}"
