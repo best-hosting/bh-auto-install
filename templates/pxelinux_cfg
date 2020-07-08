@@ -5,7 +5,7 @@ DEFAULT vesamenu.c32
 FONT {{ pxe_menu_font | basename }}
 
 MENU MARGIN 20
-MENU ROWS 18
+MENU ROWS 13
 MENU BACKGROUND splash.png
 #MENU COLOR scrollbar 30;44 #40C67739 #00000000 std
 MENU COLOR scrollbar 30;44 #40FFFFFF #00000000 std
@@ -14,19 +14,38 @@ MENU COLOR border    30;44 #40FFFFFF #00000000 std
 
 MENU TITLE BH pxe
 
-MENU BEGIN {{ hosts_pxe_menu_cfg | basename }}
+MENU BEGIN {{ hosts_pxe_menu | basename }}
 MENU LABEL {{ '^' + hosts_pxe_menu }}
-MENU ROWS 10
 
 LABEL
         MENU LABEL ..
         MENU EXIT
 
-INCLUDE {{ hosts_pxe_menu_cfg }}
+INCLUDE {{ hostvars[_pxe_server].pxelinux_incl_dir + '/' + hosts_pxe_menu_cfg }}
 
 MENU END
 
-# BEGIN bh-auto-install ANSIBLE MANAGED BLOCK
+MENU SEPARATOR
 
-# END bh-auto-install ANSIBLE MANAGED BLOCK
+{% for menu in pxe_menus %}
+
+MENU BEGIN {{ menu }}
+MENU LABEL ^{{ menu }}
+
+LABEL
+        MENU LABEL ..
+        MENU EXIT
+
+  {% for menu_cfg in pxe_os.values()
+                        | selectattr('pxe_menu', 'equalto', menu)
+                        | map(attribute='pxe_menu_cfg')
+                        | unique %}
+
+INCLUDE {{ hostvars[_pxe_server].pxelinux_incl_dir + '/' + menu_cfg }}
+
+  {% endfor %}
+
+MENU END
+
+{% endfor %}
 

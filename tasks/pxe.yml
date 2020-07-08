@@ -62,27 +62,6 @@
   tags:
     - install_pxe
 
-- block:
-    - name: pxe | Copy files used in pxelinux config
-      copy:
-        src:  "{{ item }}"
-        dest: "{{ hostvars[_pxe_server].pxe_root_path + '/' + item | basename }}"
-      loop:
-        - "{{ pxe_menu_font }}"
-        - "{{ pxe_splash }}"
-
-    - name: pxe | Create main pxelinux config
-      template:
-        src:  'pxelinux_cfg'
-        dest: "{{ hostvars[_pxe_server].pxe_root_path + '/pxelinux.cfg/default' }}"
-        force: "{{ force_overwrite }}"
-        backup: yes
-
-  delegate_to: "{{ _pxe_server }}"
-  tags:
-    - install_pxe_conf
-    - install_pxe
-
 # Enforce correct state of kickstart and pxe host configs: create for hosts in
 # `new` group and delete for hosts in `installed` group. Hosts in other groups
 # are _ignored_.
@@ -142,42 +121,27 @@
           }}
       when: force_overwrite or pxe_hosts_added.changed or pxe_hosts_deleted.changed
 
-    - name: pxe | Add menus to main pxelinux config
-      blockinfile:
-        marker: '# {mark} bh-auto-install ANSIBLE MANAGED BLOCK'
-        state: present
-        dest: >-
-          {{ hostvars[_pxe_server].pxe_root_path + '/' + hostvars[_pxe_server].pxelinux_cfg }}
-        block: |
+  when: inventory_hostname in groups['servers']
+  delegate_to: "{{ _pxe_server }}"
 
-            MENU SEPARATOR
+- block:
+    - name: pxe | Copy files used in pxelinux config
+      copy:
+        src:  "{{ item }}"
+        dest: "{{ hostvars[_pxe_server].pxe_root_path + '/' + item | basename }}"
+      loop:
+        - "{{ pxe_menu_font }}"
+        - "{{ pxe_splash }}"
 
-            {% for menu in pxe_menus %}
-
-            MENU BEGIN {{ menu }}
-            MENU LABEL ^{{ menu }}
-            MENU ROWS 10
-
-            LABEL
-                    MENU LABEL ..
-                    MENU EXIT
-
-              {% for menu_cfg in pxe_os.values()
-                                    | selectattr('pxe_menu', 'equalto', menu)
-                                    | map(attribute='pxe_menu_cfg')
-                                    | unique %}
-
-            INCLUDE {{ menu_cfg }}
-
-              {% endfor %}
-
-            MENU END
-
-            {% endfor %}
+    - name: pxe | Generate main pxelinux config
+      template:
+        src:  'pxelinux_cfg'
+        dest: "{{ hostvars[_pxe_server].pxe_root_path + '/pxelinux.cfg/default' }}"
+        force: yes
+        backup: yes
       vars:
         pxe_menus: >-
           {{ pxe_os.values() | map(attribute='pxe_menu') | unique | list }}
 
-  when: inventory_hostname in groups['servers']
   delegate_to: "{{ _pxe_server }}"
 
