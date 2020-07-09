@@ -54,3 +54,4 @@ MENU END
 
 {% endfor %}
 
+INCLUDE {{ addon_pxe_menus_cfg }}

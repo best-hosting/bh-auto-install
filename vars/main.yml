@@ -20,3 +20,5 @@ pxe_modules_path: "{{ hostvars[_pxe_server].pxe_root_path + '/syslinux' }}"
 hosts_pxe_menu_cfg_d: "{{ hostvars[_pxe_server].pxe_cfg_d_path + '/hosts' }}"
 hosts_pxe_menu_cfg: 'hosts.cfg'
 hosts_pxe_menu: 'Hosts'
+addon_pxe_menus_cfg: >-
+  {{ hostvars[_pxe_server].pxelinux_incl_dir + '/' + addon_pxe_menus_file | basename }}

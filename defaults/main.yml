@@ -38,6 +38,9 @@ pxe_menu_colors:
   - 'MENU COLOR help          37;40 #c0ffffff #00000000 std'
   - 'MENU COLOR msg07         37;40 #90ffffff #00000000 std'
 
+# File with additional pxe menus to include at the end.
+addon_pxe_menus_file: "{{ playbook_dir + '/addon_pxe_menus.cfg' }}"
+
 # Dictionary with default settings for particular network indexed by _network_
 # address. It will be queried for 'gw' and 'ns' fields, if they are omitted in
 # element 0 of 'os_install.net' list.  And, because 'gw' and 'ns' fields are

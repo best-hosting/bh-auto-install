@@ -133,6 +133,14 @@
         - "{{ pxe_menu_font }}"
         - "{{ pxe_splash }}"
 
+    - name: pxe (pxe_server) | Copy additional pxe menus config file
+      copy:
+        src:  "{{ item }}"
+        dest: "{{ hostvars[_pxe_server].pxe_root_path + '/' + addon_pxe_menus_cfg }}"
+      vars:
+        item: >-
+          {{ lookup('first_found', [addon_pxe_menus_file, 'files/addon_pxe_menus']) }}
+
     - name: pxe (pxe_server) | Generate main pxelinux config
       template:
         src:  'pxelinux_cfg'
