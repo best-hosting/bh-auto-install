@@ -7,8 +7,36 @@ default_raid: false
 # Whether to use lvm by default.
 default_lvm: false
 
-pxe_menu_font: "{{ playbook_dir + '/CyrKoi-Fixed18.psf' }}"
+# Enable or disable pxe graphical menu.
+pxe_graphical_menu: false
+
+# Pxe graphical menu background image.
 pxe_splash: "{{ playbook_dir + '/splash.png' }}"
+
+# PSF font for pxe menu.
+pxe_menu_font: "{{ playbook_dir + '/CyrKoi-Fixed18.psf' }}"
+
+# PXE colors definition.
+pxe_menu_colors:
+  - 'MENU COLOR screen        37;40 #80ffffff #00000000 std'
+  - 'MENU COLOR border        30;44 #40000000 #00000000 std'
+  - 'MENU COLOR title       1;36;44 #c00090f0 #00000000 std'
+  - 'MENU COLOR unsel         37;44 #90ffffff #00000000 std'
+  - 'MENU COLOR hotkey      1;37;44 #ffffffff #00000000 std'
+  - 'MENU COLOR sel         7;37;40 #e0000000 #20ff8000 all'
+  - 'MENU COLOR hotsel    1;7;37;40 #e0400000 #20ff8000 all'
+  - 'MENU COLOR disabled    1;30;44 #60cccccc #00000000 std'
+  - 'MENU COLOR scrollbar     30;44 #40000000 #00000000 std'
+  - 'MENU COLOR tabmsg        31;40 #90ffff00 #00000000 std'
+  - 'MENU COLOR cmdmark     1;36;40 #c000ffff #00000000 std'
+  - 'MENU COLOR cmdline       37;40 #c0ffffff #00000000 std'
+  - 'MENU COLOR pwdborder     30;47 #80ffffff #20ffffff std'
+  - 'MENU COLOR pwdheader     31;47 #80ff8080 #20ffffff std'
+  - 'MENU COLOR pwdentry      30;47 #80ffffff #20ffffff std'
+  - 'MENU COLOR timeout_msg   37;40 #80ffffff #00000000 std'
+  - 'MENU COLOR timeout     1;37;40 #c0ffffff #00000000 std'
+  - 'MENU COLOR help          37;40 #c0ffffff #00000000 std'
+  - 'MENU COLOR msg07         37;40 #90ffffff #00000000 std'
 
 # Dictionary with default settings for particular network indexed by _network_
 # address. It will be queried for 'gw' and 'ns' fields, if they are omitted in
