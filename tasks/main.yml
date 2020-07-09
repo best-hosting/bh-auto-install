@@ -1,5 +1,24 @@
 ---
 
+- block:
+    - name: define | Define pxe server
+      set_fact:
+        _pxe_server: >-
+          {{ pxe_server | default(groups['pxe_servers'] | first) }}
+        _kickstart_server: >-
+          {{ kickstart_server | default(groups['kickstart_servers'] | first) }}
+
+    - name: Gather facts about pxe server
+      setup:
+      loop:
+        - "{{ _pxe_server }}"
+        - "{{ _kickstart_server }}"
+      delegate_to: "{{ item }}"
+      delegate_facts: true
+
+  tags:
+    - always
+
 - name: Define variables.
   import_tasks: define.yml
   tags:

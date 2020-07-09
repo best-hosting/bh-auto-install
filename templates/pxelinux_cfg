@@ -26,7 +26,7 @@ LABEL
         MENU LABEL ..
         MENU EXIT
 
-INCLUDE {{ hostvars[_pxe_server].pxelinux_incl_dir + '/' + hosts_pxe_menu_cfg }}
+INCLUDE {{ hostvars[_pxe_server]._pxelinux_incl_dir + '/' + hosts_pxe_menu_cfg }}
 
 MENU END
 
@@ -46,7 +46,7 @@ LABEL
                         | map(attribute='pxe_menu_cfg')
                         | unique %}
 
-INCLUDE {{ hostvars[_pxe_server].pxelinux_incl_dir + '/' + menu_cfg }}
+INCLUDE {{ hostvars[_pxe_server]._pxelinux_incl_dir + '/' + menu_cfg }}
 
   {% endfor %}
 

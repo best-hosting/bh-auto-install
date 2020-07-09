@@ -20,5 +20,5 @@
       when: not _host_conf.gen_ks or inventory_hostname in groups['installed']
 
   when: inventory_hostname in groups['servers']
-  delegate_to: "{{ kickstart_server }}"
+  delegate_to: "{{ _kickstart_server }}"
 

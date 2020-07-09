@@ -14,9 +14,9 @@
         dest: "{{ item }}"
         state: directory
       loop:
-        - "{{ hostvars[_pxe_server].pxe_root_path }}"
+        - "{{ pxe_root_path }}"
         - "{{ pxe_modules_path }}"
-        - "{{ hostvars[_pxe_server].pxe_root_path + '/pxelinux.cfg' }}"
+        - "{{ pxe_root_path + '/pxelinux.cfg' }}"
       notify:
         - restart tftpd
 
@@ -25,7 +25,7 @@
         path: '/etc/default/tftpd-hpa'
         backup: yes
         regexp: '^TFTP_DIRECTORY='
-        line: "{{ 'TFTP_DIRECTORY=\"' + hostvars[_pxe_server].pxe_root_path + '\"' }}"
+        line: "{{ 'TFTP_DIRECTORY=\"' + pxe_root_path + '\"' }}"
       notify:
         - restart tftpd
 
@@ -34,14 +34,14 @@
         path: '/etc/default/tftpd-hpa'
         backup: yes
         regexp: '^TFTP_ADDRESS='
-        line: "{{ 'TFTP_ADDRESS=\"' + hostvars[_pxe_server].tftp_address + '\"' }}"
+        line: "{{ 'TFTP_ADDRESS=\"' + hostvars[_pxe_server]._tftp_address + '\"' }}"
       notify:
         - restart tftpd
 
     - name: pxe (pxe_server) | Copy pxelinux.0
       copy:
         src:  "{{ item }}"
-        dest: "{{ hostvars[_pxe_server].pxe_root_path + '/' + item | basename }}"
+        dest: "{{ pxe_root_path + '/' + item | basename }}"
         remote_src: yes
       vars:
         item: '/usr/lib/PXELINUX/pxelinux.0'
@@ -88,8 +88,8 @@
         src: "{{ _pxe_os.pxe_menu_cfg_d }}"
         regexp: "[0-9]_[^/]+\\.cfg$"
         dest: >-
-          {{ hostvars[_pxe_server].pxe_root_path
-              + '/' + hostvars[_pxe_server].pxelinux_incl_dir
+          {{ pxe_root_path
+              + '/' + hostvars[_pxe_server]._pxelinux_incl_dir
               + '/' + _pxe_os.pxe_menu_cfg
           }}
       when: force_overwrite or pxe_os_added.changed
@@ -115,8 +115,8 @@
         src: "{{ hosts_pxe_menu_cfg_d }}"
         regexp: "[0-9]_[^/]+\\.cfg$"
         dest: >-
-          {{ hostvars[_pxe_server].pxe_root_path
-              + '/' + hostvars[_pxe_server].pxelinux_incl_dir
+          {{ pxe_root_path
+              + '/' + hostvars[_pxe_server]._pxelinux_incl_dir
               + '/' + hosts_pxe_menu_cfg
           }}
       when: force_overwrite or pxe_hosts_added.changed or pxe_hosts_deleted.changed
@@ -128,7 +128,7 @@
     - name: pxe (pxe_server) | Copy files used in pxelinux config
       copy:
         src:  "{{ item }}"
-        dest: "{{ hostvars[_pxe_server].pxe_root_path + '/' + item | basename }}"
+        dest: "{{ pxe_root_path + '/' + item | basename }}"
       loop:
         - "{{ pxe_menu_font }}"
         - "{{ pxe_splash }}"
@@ -136,7 +136,7 @@
     - name: pxe (pxe_server) | Copy additional pxe menus config file
       copy:
         src:  "{{ item }}"
-        dest: "{{ hostvars[_pxe_server].pxe_root_path + '/' + addon_pxe_menus_cfg }}"
+        dest: "{{ pxe_root_path + '/' + addon_pxe_menus_cfg }}"
       vars:
         item: >-
           {{ lookup('first_found', [addon_pxe_menus_file, 'files/addon_pxe_menus']) }}
@@ -144,7 +144,7 @@
     - name: pxe (pxe_server) | Generate main pxelinux config
       template:
         src:  'pxelinux_cfg'
-        dest: "{{ hostvars[_pxe_server].pxe_root_path + '/pxelinux.cfg/default' }}"
+        dest: "{{ pxe_root_path + '/pxelinux.cfg/default' }}"
         force: yes
         backup: yes
       vars:
