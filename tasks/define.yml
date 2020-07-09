@@ -34,6 +34,37 @@
         - '_pxelinux_incl_dir'
 
 - block:
+    - name: define | Define pxe menus config
+      set_fact:
+        _pxe_menus: >-
+          {{ _pxe_menus | combine(
+                { item : item_pxe_menu
+                    | combine(
+                        { 'cfg_d' : hostvars[_pxe_server]._pxe_cfg_d_path + '/' + item
+                        , 'cfg'   : hostvars[_pxe_server]._pxelinux_incl_dir + '/' + item + '.cfg'
+                        })
+                })
+          }}
+      vars:
+        item_pxe_menu: >-
+          {{ pxe_menus[item] | default(
+                  { 'desc' : item + ' (undefined pxe menu name)'
+                                if item != hosts_pxe_menu
+                                else 'Hosts'
+                  })
+          }}
+      loop: >-
+        {{ pxe_os.values()
+                | selectattr('pxe_menu', 'defined')
+                | map(attribute='pxe_menu')
+                | unique() | list
+              + [hosts_pxe_menu] }}
+
+    - name: define | Show pxe OS menus config
+      debug:
+        var: _pxe_menus
+
+- block:
     - name: define | Define OS install config
       set_fact:
         pxe_root_path: "{{ hostvars[_pxe_server]._pxe_root_path }}"
@@ -52,7 +83,7 @@
               , 'gen_pxe_host' : true
               } | combine(os_install,
                     { 'name'    : item_name
-                    , 'pxe_cfg' : hosts_pxe_menu_cfg_d + '/50_' + item_name + '.cfg'
+                    , 'pxe_cfg' : _pxe_menus[hosts_pxe_menu].cfg_d + '/50_' + item_name + '.cfg'
                     , 'ks_cfg'  : hostvars[_kickstart_server].ks_www_root + '/' + item_name + '.cfg'
                     , 'ks_www'  : hostvars[_kickstart_server].ks_www_addr + '/' + item_name + '.cfg'
                     }
@@ -95,7 +126,7 @@
   when: inventory_hostname in groups['servers']
 
 - block:
-    - name: images | Define pxe OS config
+    - name: define | Define pxe OS config
       set_fact:
         _pxe_os: >-
           {{ item_os | combine(
@@ -106,8 +137,11 @@
                 , 'pxe_dir'       : item_pxe_dir
                 , 'pxe_kernel'    : item_pxe_dir + '/' + item_os.iso_kernel | basename
                 , 'pxe_initrd'    : item_pxe_dir + '/' + item_os.iso_initrd | basename
+                , 'pxe_menu_cfg'  : hostvars[_pxe_server]._pxelinux_incl_dir
+                                      + '/' + item_os.pxe_menu + '.cfg'
                 , 'pxe_menu_cfg_d' : item_pxe_menu_cfg_d
                 , 'pxe_cfg'       : item_pxe_menu_cfg_d + '/50_' + item_name + '.cfg'
+                , 'gen_pxe_os'  : item_os.gen_pxe_os | default(true)
                 }
               )
           }}
@@ -123,10 +157,9 @@
         item_pxe_dir: >-
           {{ item_name }}
         item_pxe_menu_cfg_d: >-
-          {{ hostvars[_pxe_server]._pxe_cfg_d_path
-                + '/' + item_os.pxe_menu_cfg | basename | splitext | first }}
+          {{ hostvars[_pxe_server]._pxe_cfg_d_path + '/' + item_os.pxe_menu }}
 
-    - name: images | Show pxe OS config
+    - name: define | Show pxe OS config
       debug:
         var: _pxe_os
 

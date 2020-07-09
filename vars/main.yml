@@ -15,10 +15,13 @@ file_does_not_exist: "{{ '/' + 65534 | random(seed=_host_conf.name) | hash('sha1
 # tftp requests in 'daemon.log'.
 pxe_modules_path: "{{ pxe_root_path + '/syslinux' }}"
 
-# All hosts should use single pxe config location and single pxe menu config,
-# so i can gather all hosts into single 'Hosts' menu in pxe.
-hosts_pxe_menu_cfg_d: "{{ hostvars[_pxe_server]._pxe_cfg_d_path + '/hosts' }}"
-hosts_pxe_menu_cfg: 'hosts.cfg'
-hosts_pxe_menu: 'Hosts'
+# Hosts pxe menu name used in 'pxe_menus' dictionary.
+hosts_pxe_menu: 'hosts'
+
+# Additional pxe menus config file. Path should be written in such way, so
+# that it can be used in pxelinux config.
 addon_pxe_menus_cfg: >-
   {{ hostvars[_pxe_server]._pxelinux_incl_dir + '/' + addon_pxe_menus_file | basename }}
+
+# Internal pxe_menus dictionary.
+_pxe_menus: {}

@@ -73,8 +73,7 @@ pxe_os:
       , 'iso_kernel': 'images/pxeboot/vmlinuz'
       , 'iso_initrd': 'images/pxeboot/initrd.img'
       , 'iso_type': 'iso'
-      , 'pxe_menu': 'CentOS-huy'
-      , 'pxe_menu_cfg': 'centos.cfg'
+      , 'pxe_menu': 'centos'
       }
   , 'centos7' :
       { 'desc': 'CentOS 7'
@@ -87,8 +86,7 @@ pxe_os:
       , 'iso_kernel': 'images/pxeboot/vmlinuz'
       , 'iso_initrd': 'images/pxeboot/initrd.img'
       , 'iso_type': 'iso'
-      , 'pxe_menu': 'CentOS-huy'
-      , 'pxe_menu_cfg': 'centos.cfg'
+      , 'pxe_menu': 'centos'
       }
   , 'centos8' :
       { 'desc': 'CentOS 8'
@@ -101,8 +99,7 @@ pxe_os:
       , 'iso_kernel': 'images/pxeboot/vmlinuz'
       , 'iso_initrd': 'images/pxeboot/initrd.img'
       , 'iso_type': 'iso'
-      , 'pxe_menu': 'CentOS-huy'
-      , 'pxe_menu_cfg': 'centos.cfg'
+      , 'pxe_menu': 'centos'
       }
   , 'debian6' :
       { 'desc': 'Debian 6 (squeeze)'
@@ -116,8 +113,7 @@ pxe_os:
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
       , 'iso_type': 'archive'
-      , 'pxe_menu': 'Debian-huy'
-      , 'pxe_menu_cfg': 'debian.cfg'
+      , 'pxe_menu': 'debian'
       }
   , 'debian7' :
       { 'desc': 'Debian 7 (wheezy)'
@@ -131,8 +127,7 @@ pxe_os:
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
       , 'iso_type': 'archive'
-      , 'pxe_menu': 'Debian-huy'
-      , 'pxe_menu_cfg': 'debian.cfg'
+      , 'pxe_menu': 'debian'
       }
   , 'debian8' :
       { 'desc': 'Debian 8 (jessie)'
@@ -146,8 +141,7 @@ pxe_os:
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
       , 'iso_type': 'archive'
-      , 'pxe_menu': 'Debian-huy'
-      , 'pxe_menu_cfg': 'debian.cfg'
+      , 'pxe_menu': 'debian'
       }
   , 'debian9' :
       { 'desc': 'Debian 9 (stretch)'
@@ -161,8 +155,7 @@ pxe_os:
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
       , 'iso_type': 'archive'
-      , 'pxe_menu': 'Debian-huy'
-      , 'pxe_menu_cfg': 'debian.cfg'
+      , 'pxe_menu': 'debian'
       }
   , 'debian10' :
       { 'desc': 'Debian 10 (buster)'
@@ -176,9 +169,14 @@ pxe_os:
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
       , 'iso_type': 'archive'
-      , 'pxe_menu': 'Debian-huy'
-      , 'pxe_menu_cfg': 'debian.cfg'
+      , 'pxe_menu': 'debian'
       }
+  }
+
+# Friendly names for pxe menus referenced from 'pxe_os'.
+pxe_menus:
+  { 'debian'  : { 'desc' : 'Debian' }
+  , 'centos'  : { 'desc' : 'CentOS' }
   }
 
 # 'pxe_root_path': root path served by tftp server (i.e. accessible for

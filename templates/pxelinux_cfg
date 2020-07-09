@@ -19,36 +19,16 @@ MENU BACKGROUND splash.png
 
 MENU TITLE BH pxe
 
-MENU BEGIN {{ hosts_pxe_menu | basename }}
-MENU LABEL {{ '^' + hosts_pxe_menu }}
-
-LABEL
-        MENU LABEL ..
-        MENU EXIT
-
-INCLUDE {{ hostvars[_pxe_server]._pxelinux_incl_dir + '/' + hosts_pxe_menu_cfg }}
-
-MENU END
-
-MENU SEPARATOR
-
-{% for menu in pxe_menus %}
+{% for menu in _pxe_menus.keys() %}
 
 MENU BEGIN {{ menu }}
-MENU LABEL ^{{ menu }}
+MENU LABEL ^{{ _pxe_menus[menu].desc }}
 
 LABEL
         MENU LABEL ..
         MENU EXIT
 
-  {% for menu_cfg in pxe_os.values()
-                        | selectattr('pxe_menu', 'equalto', menu)
-                        | map(attribute='pxe_menu_cfg')
-                        | unique %}
-
-INCLUDE {{ hostvars[_pxe_server]._pxelinux_incl_dir + '/' + menu_cfg }}
-
-  {% endfor %}
+INCLUDE {{ hostvars[_pxe_server]._pxelinux_incl_dir + '/' + menu + '.cfg' }}
 
 MENU END
 
