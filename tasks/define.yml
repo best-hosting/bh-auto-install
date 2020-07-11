@@ -81,7 +81,7 @@
               , 'disks' : ['sda', 'sdb'] if item_raid else ['sda']
               , 'gen_ks' : true
               , 'gen_pxe_host' : true
-              } | combine(os_install,
+              } | combine(install_conf,
                     { 'name'    : item_name
                     , 'pxe_cfg' : _pxe_menus[hosts_pxe_menu].cfg_d + '/50_' + item_name + '.cfg'
                     , 'ks_cfg'  : hostvars[_kickstart_server].ks_www_root + '/' + item_name + '.cfg'
@@ -91,9 +91,9 @@
           }}
       vars:
         item_name: >-
-          {{ os_install.name | default(inventory_hostname) }}
+          {{ install_conf.name | default(inventory_hostname) }}
         item_raid: >-
-          {{ os_install.raid | default(default_raid) }}
+          {{ install_conf.raid | default(default_raid) }}
 
     - name: define | Define OS install network config
       set_fact:
@@ -101,23 +101,23 @@
           {{  _install_conf | combine({'net' : item_net}) }}
       vars:
         item_ip0_network: >-
-          {{ os_install.net[0].ip | ipaddr('network') }}
+          {{ install_conf.net[0].ip | ipaddr('network') }}
         def_ip0: >-
           {{  { 'gw' : default_net[item_ip0_network].gw
                         if default_net[item_ip0_network].gw is defined
-                        else os_install.net[0].gw
+                        else install_conf.net[0].gw
               , 'ns' : default_net[item_ip0_network].ns
                         if default_net[item_ip0_network].ns is defined
-                        else os_install.net[0].ns
+                        else install_conf.net[0].ns
               } if default_net[item_ip0_network] is defined
                 else
-                { 'gw' : os_install.net[0].gw
-                , 'ns' : os_install.net[0].ns
+                { 'gw' : install_conf.net[0].gw
+                , 'ns' : install_conf.net[0].ns
                 }
           }}
         item_net: >-
-          {{ [def_ip0 | combine(os_install.net[0])] + os_install.net[1:] }}
-      when: os_install.net is defined
+          {{ [def_ip0 | combine(install_conf.net[0])] + install_conf.net[1:] }}
+      when: install_conf.net is defined
 
     - name: define | Show OS install config
       debug:

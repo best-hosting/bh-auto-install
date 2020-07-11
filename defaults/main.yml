@@ -43,13 +43,13 @@ addon_pxe_menus_file: "{{ playbook_dir + '/addon_pxe_menus.cfg' }}"
 
 # Dictionary with default settings for particular network indexed by _network_
 # address. It will be queried for 'gw' and 'ns' fields, if they are omitted in
-# element 0 of 'os_install.net' list.  And, because 'gw' and 'ns' fields are
-# required, they should be either specified explicitly in 'os_install' or
+# element 0 of 'install_conf.net' list.  And, because 'gw' and 'ns' fields are
+# required, they should be either specified explicitly in 'install_conf' or
 # defaults for corresponding network should be specified here in
 # 'default_net'.
 default_net: {}
 
-# os_install:
+# install_conf:
 # - 'name'
 # - 'raid'
 # - 'lvm'
