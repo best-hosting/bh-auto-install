@@ -68,7 +68,7 @@
     - name: define | Define OS install config
       set_fact:
         pxe_root_path: "{{ hostvars[_pxe_server]._pxe_root_path }}"
-        _host_conf: >-
+        _install_conf: >-
           {{  { 'raid': default_raid
               , 'lvm' : default_lvm
               , 'vg_name' : item_name
@@ -97,8 +97,8 @@
 
     - name: define | Define OS install network config
       set_fact:
-        _host_conf: >-
-          {{  _host_conf | combine({'net' : item_net}) }}
+        _install_conf: >-
+          {{  _install_conf | combine({'net' : item_net}) }}
       vars:
         item_ip0_network: >-
           {{ os_install.net[0].ip | ipaddr('network') }}
@@ -121,7 +121,7 @@
 
     - name: define | Show OS install config
       debug:
-        var: _host_conf
+        var: _install_conf
 
   when: inventory_hostname in groups['servers']
 
@@ -147,7 +147,7 @@
           }}
       vars:
         item_name: >-
-          {{ _host_conf['os'] }}
+          {{ _install_conf['os'] }}
         item_os: >-
           {{ pxe_os[item_name] }}
         item_checksum_url: >-

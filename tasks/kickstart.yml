@@ -6,18 +6,18 @@
 - block:
     - name: kickstart | Create config for new hosts
       template:
-        src: "{{ _host_conf.os }}.cfg"
+        src: "{{ _install_conf.os }}.cfg"
         force: yes
         backup: no
         mode: 0755
-        dest: "{{ _host_conf.ks_cfg }}"
-      when: _host_conf.gen_ks and inventory_hostname in groups['new']
+        dest: "{{ _install_conf.ks_cfg }}"
+      when: _install_conf.gen_ks and inventory_hostname in groups['new']
 
     - name: kickstart | Delete config for _already_ installed hosts
       file:
-        dest: "{{ _host_conf.ks_cfg }}"
+        dest: "{{ _install_conf.ks_cfg }}"
         state: absent
-      when: not _host_conf.gen_ks or inventory_hostname in groups['installed']
+      when: not _install_conf.gen_ks or inventory_hostname in groups['installed']
 
   when: inventory_hostname in groups['servers']
   delegate_to: "{{ _kickstart_server }}"
