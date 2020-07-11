@@ -72,6 +72,8 @@ pxe_os:
       , 'iso_filename_rx': 'CentOS-6\.[0-9]+-x86_64-netinstall\.iso'
       , 'iso_kernel': 'images/pxeboot/vmlinuz'
       , 'iso_initrd': 'images/pxeboot/initrd.img'
+      , 'pxe_append': 'ip=dhcp repo=http://mirror.yandex.ru/centos/6/os/x86_64 lang=en_US keymap=us'
+      , 'ks_pxe_append': 'ip=dhcp'
       , 'iso_type': 'iso'
       , 'pxe_menu': 'centos'
       }
@@ -85,6 +87,8 @@ pxe_os:
       , 'iso_filename_rx': 'CentOS-7-x86_64-NetInstall-[0-9]+\.iso'
       , 'iso_kernel': 'images/pxeboot/vmlinuz'
       , 'iso_initrd': 'images/pxeboot/initrd.img'
+      , 'pxe_append': 'ip=dhcp inst.repo=http://mirror.yandex.ru/centos/7/os/x86_64 inst.lang=en_US inst.keymap=us'
+      , 'ks_pxe_append': 'ip=dhcp'
       , 'iso_type': 'iso'
       , 'pxe_menu': 'centos'
       }
@@ -98,6 +102,8 @@ pxe_os:
       , 'iso_filename_rx' : 'CentOS-8\.[0-9]+\.[0-9]+-x86_64-boot\.iso'
       , 'iso_kernel': 'images/pxeboot/vmlinuz'
       , 'iso_initrd': 'images/pxeboot/initrd.img'
+      , 'pxe_append': 'ip=dhcp inst.repo=https://mirror.yandex.ru/centos/8/BaseOS/x86_64/os inst.lang=en_US inst.keymap=us'
+      , 'ks_pxe_append': 'ip=dhcp'
       , 'iso_type': 'iso'
       , 'pxe_menu': 'centos'
       }
@@ -112,6 +118,7 @@ pxe_os:
       , 'iso_filename_rx': 'netboot\.tar\.gz'
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+      , 'pxe_append': 'vga=788 --- quiet'
       , 'iso_type': 'archive'
       , 'pxe_menu': 'debian'
       }
@@ -126,6 +133,7 @@ pxe_os:
       , 'iso_filename_rx': 'netboot\.tar\.gz'
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+      , 'pxe_append': 'vga=788 --- quiet'
       , 'iso_type': 'archive'
       , 'pxe_menu': 'debian'
       }
@@ -140,6 +148,7 @@ pxe_os:
       , 'iso_filename_rx': 'netboot\.tar\.gz'
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+      , 'pxe_append': 'vga=788 --- quiet'
       , 'iso_type': 'archive'
       , 'pxe_menu': 'debian'
       }
@@ -154,6 +163,7 @@ pxe_os:
       , 'iso_filename_rx': 'netboot\.tar\.gz'
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+      , 'pxe_append': 'vga=788 --- quiet'
       , 'iso_type': 'archive'
       , 'pxe_menu': 'debian'
       }
@@ -168,6 +178,7 @@ pxe_os:
       , 'iso_filename_rx': 'netboot\.tar\.gz'
       , 'iso_kernel': 'debian-installer/amd64/linux'
       , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+      , 'pxe_append': 'vga=788 --- quiet'
       , 'iso_type': 'archive'
       , 'pxe_menu': 'debian'
       }
