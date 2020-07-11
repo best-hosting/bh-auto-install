@@ -135,8 +135,6 @@
                 , 'checksum_dir'  : item_checksum_dir
                 , 'checksum_file' : item_checksum_dir + '/' + item_os.checksum_fn
                 , 'pxe_dir'       : item_pxe_dir
-                , 'pxe_kernel'    : item_pxe_dir + '/' + item_os.iso_kernel | basename
-                , 'pxe_initrd'    : item_pxe_dir + '/' + item_os.iso_initrd | basename
                 , 'pxe_menu_cfg'  : hostvars[_pxe_server]._pxelinux_incl_dir
                                       + '/' + item_os.pxe_menu + '.cfg'
                 , 'pxe_menu_cfg_d' : item_pxe_menu_cfg_d

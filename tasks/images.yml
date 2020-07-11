@@ -18,13 +18,14 @@
         _os_img: >-
           {{ { 'name'     : cur_name
              , 'file'     : cur_dest_dir + '/' + cur_name
+             , 'file_rel' : _pxe_os.pxe_dir + '/' + cur_name
              , 'type'     : _pxe_os.iso_type
              , 'hash'     : cur_hash
              , 'hash_type': _pxe_os.checksum_type
              , 'url'      : _pxe_os.url + '/' + cur_name
              , 'dest_dir' : cur_dest_dir
              , 'extract_dir': cur_dest_dir + '/' + cur_name | regex_search('^[^.]+(?=\.)')
-             , 'os_files' : [_pxe_os.iso_kernel, _pxe_os.iso_initrd]
+             , 'os_files' : [_pxe_os.iso_kernel, _pxe_os.iso_initrd] | select('defined') | list
              }
           }}
       vars:
@@ -71,6 +72,23 @@
     - name: images | Show OS image definitions
       debug:
         var: _os_img
+
+    - name: images | Define pxe kernel and initrd
+      set_fact:
+        _pxe_os: >-
+          {{  { 'pxe_kernel' : _pxe_os.pxe_dir + '/' + _pxe_os.iso_kernel | basename
+                                  if _pxe_os.iso_kernel is defined
+                                  else 'huy'
+              , 'pxe_initrd' : _pxe_os.pxe_dir + '/' + _pxe_os.iso_initrd | basename
+                                  if _pxe_os.iso_initrd is defined
+                                  else _os_iso.file_rel
+              , 'pxe_append' : 'iso raw' if _pxe_os.iso_type == 'raw' else ''
+              } | combine(_pxe_os)
+          }}
+
+    - name: images | Show final pxe OS definition
+      debug:
+        var: _pxe_os
 
   delegate_to: localhost
 

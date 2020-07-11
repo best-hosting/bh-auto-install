@@ -24,6 +24,11 @@
   tags:
     - always
 
+- name: Update pxe images
+  import_tasks: images.yml
+  tags:
+    - image
+
 - name: Configure pxe.
   import_tasks: pxe.yml
   tags:
@@ -33,8 +38,3 @@
   import_tasks: kickstart.yml
   tags:
     - kickstart
-
-- name: Update pxe images
-  import_tasks: images.yml
-  tags:
-    - image
