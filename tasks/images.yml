@@ -15,7 +15,7 @@
 
     - name: images (localhost) | Read checksum file
       set_fact:
-        _os_iso: >-
+        _os_img: >-
           {{ { 'name'     : cur_name
              , 'file'     : cur_dest_dir + '/' + cur_name
              , 'type'     : _pxe_os.iso_type
@@ -70,74 +70,74 @@
 
     - name: images | Show OS image definitions
       debug:
-        var: _os_iso
+        var: _os_img
 
   delegate_to: localhost
 
 - block:
     - name: images (pxe_server) | Create image directory
       file:
-        name: "{{ _os_iso.dest_dir }}"
+        name: "{{ _os_img.dest_dir }}"
         state: directory
 
     - name: image (pxe_server) | Stat image
       stat:
-        path: "{{ _os_iso.file }}"
-        checksum_algorithm: "{{ _os_iso.hash_type }}"
+        path: "{{ _os_img.file }}"
+        checksum_algorithm: "{{ _os_img.hash_type }}"
         get_checksum: true
       register: iso_file_stats
 
     - name: images (pxe_server) | Download image
       get_url:
-        url:  "{{ _os_iso.url }}"
-        dest: "{{ _os_iso.file }}"
-        checksum: "{{ _os_iso.hash_type + ':' + _os_iso.hash }}"
+        url:  "{{ _os_img.url }}"
+        dest: "{{ _os_img.file }}"
+        checksum: "{{ _os_img.hash_type + ':' + _os_img.hash }}"
         force: true
       when: force_overwrite
             or not iso_file_stats.stat.exists
-            or iso_file_stats.stat.checksum != _os_iso.hash
+            or iso_file_stats.stat.checksum != _os_img.hash
       register: iso_file_download
 
     - block:
         - name: images (pxe_server) | Extract kernel and initrd from iso
           iso_extract:
-            image:  "{{ _os_iso.file }}"
-            dest:   "{{ _os_iso.dest_dir }}"
-            files:  "{{ _os_iso.os_files }}"
+            image:  "{{ _os_img.file }}"
+            dest:   "{{ _os_img.dest_dir }}"
+            files:  "{{ _os_img.os_files }}"
             force:  true
 
-      when: _os_iso.type == 'iso'
+      when: _os_img.type == 'iso'
 
     - block:
         - name: images (pxe_server) | Create image archive extract directory
           file:
-            name: "{{ _os_iso.extract_dir }}"
+            name: "{{ _os_img.extract_dir }}"
             state: directory
 
         - name: images (pxe_server) | Extract image archive
           unarchive:
-            src:    "{{ _os_iso.file }}"
-            dest:   "{{ _os_iso.extract_dir }}"
+            src:    "{{ _os_img.file }}"
+            dest:   "{{ _os_img.extract_dir }}"
             remote_src: yes
             creates: >-
               {{  ( force_overwrite or iso_file_download.changed )
-                  | ternary(file_does_not_exist, _os_iso.extract_dir + '/' + _pxe_os.iso_kernel)
+                  | ternary(file_does_not_exist, _os_img.extract_dir + '/' + _pxe_os.iso_kernel)
               }}
 
         - name: images (pxe_server) | Copy kernel and initrd from archive
           copy:
-            src:    "{{ _os_iso.extract_dir + '/' + item }}"
-            dest:   "{{ _os_iso.dest_dir }}"
+            src:    "{{ _os_img.extract_dir + '/' + item }}"
+            dest:   "{{ _os_img.dest_dir }}"
             remote_src: yes
-          loop: "{{ _os_iso.os_files }}"
+          loop: "{{ _os_img.os_files }}"
 
-      when: _os_iso.type == 'archive'
+      when: _os_img.type == 'archive'
       delegate_to: "{{ _pxe_server }}"
 
     - block:
         - name: images (pxe_server) | Find all images
           find:
-            paths: "{{ _os_iso.dest_dir }}"
+            paths: "{{ _os_img.dest_dir }}"
             patterns: "{{ _pxe_os.iso_filename_rx }}"
             file_type: file
             use_regex: true
@@ -148,7 +148,7 @@
           file:
             path: "{{ item.path }}"
             state: absent
-          when: item.path != _os_iso.file
+          when: item.path != _os_img.file
           loop: "{{ image_files.files }}"
 
   delegate_to: "{{ _pxe_server }}"

@@ -7,7 +7,7 @@ _install_conf: {}
 images_checksum_dir: "{{ playbook_dir + '/image_checksums' }}"
 
 _pxe_os: {}
-_os_iso: {}
+_os_img: {}
 
 file_does_not_exist: "{{ '/' + 65534 | random(seed=_install_conf.name) | hash('sha1') }}"
 
