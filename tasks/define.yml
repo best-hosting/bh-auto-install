@@ -140,7 +140,8 @@
                 , 'pxe_menu_cfg'  : hostvars[_pxe_server]._pxelinux_incl_dir
                                       + '/' + item_os.pxe_menu + '.cfg'
                 , 'pxe_menu_cfg_d' : item_pxe_menu_cfg_d
-                , 'pxe_cfg'       : item_pxe_menu_cfg_d + '/50_' + item_name + '.cfg'
+                , 'pxe_cfg'       : item_pxe_menu_cfg_d
+                                      + '/' + item_pxe_cfg_index + '_' + item_name + '.cfg'
                 , 'gen_pxe_os'  : item_os.gen_pxe_os | default(true)
                 }
               )
@@ -158,6 +159,8 @@
           {{ item_name }}
         item_pxe_menu_cfg_d: >-
           {{ hostvars[_pxe_server]._pxe_cfg_d_path + '/' + item_os.pxe_menu }}
+        item_pxe_cfg_index: >-
+          {{ pxe_os_cfg_index_offset + item_os.sort_index }}
 
     - name: define | Show pxe OS config
       debug:

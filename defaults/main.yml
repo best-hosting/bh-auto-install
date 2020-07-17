@@ -61,6 +61,9 @@ default_net: {}
 # -   'gw'
 # -   'ns'
 
+# Start index for use in pxe OS config names.
+pxe_os_cfg_index_offset: 30
+
 pxe_os:
   { 'centos6' :
       { 'desc': 'CentOS 6'
@@ -76,7 +79,9 @@ pxe_os:
       , 'ks_pxe_append': 'ip=dhcp'
       , 'iso_type': 'iso'
       , 'pxe_menu': 'centos'
+      , 'sort_index':  6
       }
+
   , 'centos7' :
       { 'desc': 'CentOS 7'
       , 'url' : 'https://mirror.yandex.ru/centos/7/isos/x86_64'
@@ -91,7 +96,9 @@ pxe_os:
       , 'ks_pxe_append': 'ip=dhcp'
       , 'iso_type': 'iso'
       , 'pxe_menu': 'centos'
+      , 'sort_index':  7
       }
+
   , 'centos8' :
       { 'desc': 'CentOS 8'
       , 'url' : 'https://mirror.yandex.ru/centos/8/isos/x86_64'
@@ -106,7 +113,9 @@ pxe_os:
       , 'ks_pxe_append': 'ip=dhcp'
       , 'iso_type': 'iso'
       , 'pxe_menu': 'centos'
+      , 'sort_index':  8
       }
+
   , 'debian6' :
       { 'desc': 'Debian 6 (squeeze)'
       , 'url' : 'http://archive.debian.org/debian/dists/squeeze/main/installer-amd64/current/images/netboot'
@@ -121,7 +130,9 @@ pxe_os:
       , 'pxe_append': 'vga=788 --- quiet'
       , 'iso_type': 'archive'
       , 'pxe_menu': 'debian'
+      , 'sort_index':  6
       }
+
   , 'debian7' :
       { 'desc': 'Debian 7 (wheezy)'
       , 'url' : 'http://archive.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot'
@@ -136,7 +147,9 @@ pxe_os:
       , 'pxe_append': 'vga=788 --- quiet'
       , 'iso_type': 'archive'
       , 'pxe_menu': 'debian'
+      , 'sort_index':  7
       }
+
   , 'debian8' :
       { 'desc': 'Debian 8 (jessie)'
       , 'url' : 'http://ftp.debian.org/debian/dists/jessie/main/installer-amd64/current/images/netboot'
@@ -151,7 +164,9 @@ pxe_os:
       , 'pxe_append': 'vga=788 --- quiet'
       , 'iso_type': 'archive'
       , 'pxe_menu': 'debian'
+      , 'sort_index':  8
       }
+
   , 'debian9' :
       { 'desc': 'Debian 9 (stretch)'
       , 'url' : 'http://ftp.debian.org/debian/dists/stretch/main/installer-amd64/current/images/netboot'
@@ -166,7 +181,9 @@ pxe_os:
       , 'pxe_append': 'vga=788 --- quiet'
       , 'iso_type': 'archive'
       , 'pxe_menu': 'debian'
+      , 'sort_index':  9
       }
+
   , 'debian10' :
       { 'desc': 'Debian 10 (buster)'
       , 'url' : 'http://ftp.debian.org/debian/dists/buster/main/installer-amd64/current/images/netboot'
@@ -181,6 +198,7 @@ pxe_os:
       , 'pxe_append': 'vga=788 --- quiet'
       , 'iso_type': 'archive'
       , 'pxe_menu': 'debian'
+      , 'sort_index':  10
       }
   }
 
