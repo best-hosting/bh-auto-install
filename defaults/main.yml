@@ -14,7 +14,7 @@ pxe_graphical_menu: false
 pxe_splash: "{{ playbook_dir + '/splash.png' }}"
 
 # PSF font for pxe menu.
-pxe_menu_font: "{{ playbook_dir + '/CyrKoi-Fixed18.psf' }}"
+pxe_menu_font: "{{ role_path + '/files/CyrKoi-Fixed18.psf' }}"
 
 # PXE colors definition.
 pxe_menu_colors:

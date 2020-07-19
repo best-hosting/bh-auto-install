@@ -105,13 +105,21 @@
   delegate_to: "{{ _pxe_server }}"
 
 - block:
-    - name: pxe (pxe_server) | Copy files used in pxelinux config
-      copy:
-        src:  "{{ item }}"
-        dest: "{{ pxe_root_path + '/' + item | basename }}"
+    - name: pxe (pxe_server) | Stat additional files used in pxelinux config
+      stat:
+        path: "{{ item }}"
+      register: addon_pxe_files
       loop:
         - "{{ pxe_menu_font }}"
         - "{{ pxe_splash }}"
+      delegate_to: localhost
+
+    - name: pxe (pxe_server) | Copy additional files used in pxelinux config
+      copy:
+        src:  "{{ item.stat.path }}"
+        dest: "{{ pxe_root_path + '/' + item.stat.path | basename }}"
+      when: item.stat.exists
+      loop: "{{ addon_pxe_files.results }}"
 
     - name: pxe (pxe_server) | Generate pxe menus
       assemble:
