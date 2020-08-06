@@ -136,5 +136,22 @@
       when: _os_iso.type == 'archive'
       delegate_to: "{{ _host_conf['pxe_server'] }}"
 
+    - block:
+        - name: images (pxe_server) | Find all images
+          find:
+            paths: "{{ _os_iso.dest_dir }}"
+            patterns: "{{ _pxe_os.iso_filename_rx }}"
+            file_type: file
+            use_regex: true
+            recurse: false
+          register: image_files
+
+        - name: images (pxe_server) | Delete old images
+          file:
+            path: "{{ item.path }}"
+            state: absent
+          when: item.path != _os_iso.file
+          loop: "{{ image_files.files }}"
+
   delegate_to: "{{ _host_conf['pxe_server'] }}"
 
