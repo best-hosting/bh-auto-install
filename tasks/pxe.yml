@@ -103,6 +103,8 @@
 
   when: inventory_hostname in groups['servers']
   delegate_to: "{{ _pxe_server }}"
+  tags:
+    - pxe_host
 
 - block:
     - name: pxe (pxe_server) | Stat additional files used in pxelinux config
@@ -145,4 +147,6 @@
         backup: yes
 
   delegate_to: "{{ _pxe_server }}"
+  tags:
+    - pxe_host
 

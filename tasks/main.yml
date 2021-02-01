@@ -33,6 +33,7 @@
   import_tasks: kickstart.yml
   tags:
     - kickstart
+    - pxe_host
 
 - name: Update pxe images
   import_tasks: images.yml
