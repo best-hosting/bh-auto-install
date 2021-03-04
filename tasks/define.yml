@@ -72,12 +72,10 @@
           {{  { 'raid': default_raid
               , 'lvm' : default_lvm
               , 'vg_name' : item_name
-              , 'rootpw'  : lookup('file',
-                              lookup('first_found',
-                                [ 'passwords/' + item_name
-                                , 'passwords/default'
-                                ])
-                              )
+              , 'rootpw_file' : item_rootpw_file
+              , 'rootpw'  : lookup('password', item_rootpw_file + ' length=18 chars=ascii_letters,digits')
+                              if inventory_hostname in groups['new']
+                              else ''
               , 'disks' : ['sda', 'sdb'] if item_raid else ['sda']
               , 'gen_ks' : true
               , 'gen_pxe_host' : true
@@ -94,6 +92,8 @@
           {{ install_conf.name | default(inventory_hostname) }}
         item_raid: >-
           {{ install_conf.raid | default(default_raid) }}
+        item_rootpw_file: >-
+          {{ 'passwords/' + item_name }}
 
     - name: define | Define OS install network config
       set_fact:
@@ -122,6 +122,16 @@
     - name: define | Show OS install config
       debug:
         var: _install_conf
+
+    # This file may have been created implicitly by 'password' lookup plugin
+    # in '_install_conf' definition, if it did not exist. But even if it was
+    # created manually, i don't want to keep passwords for installed hosts.
+    - name: define | Delete local password copy for _already_ installed hosts
+      file:
+        dest: "{{ _install_conf.rootpw_file }}"
+        state: absent
+      delegate_to: 'localhost'
+      when: delete_installed_rootpw and inventory_hostname in groups['installed']
 
   when: inventory_hostname in groups['servers']
 

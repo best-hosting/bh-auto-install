@@ -1,6 +1,12 @@
 ---
 # defaults file for bh-auto-install
 
+# Whether to delete local root password copy for installed hosts. If i set
+# password manually, i may want to set this to 'false' to avoid deleting
+# password file, when installation had finished or not yet begin (i.e. when
+# host is in group 'installed', not 'new').
+delete_installed_rootpw: true
+
 # Whether to build raid by default.
 default_raid: false
 
