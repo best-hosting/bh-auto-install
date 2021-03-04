@@ -39,3 +39,17 @@
   import_tasks: images.yml
   tags:
     - image
+
+- name: Print host access details
+  debug:
+    msg: "{{ msg_header.split('\n') + msg_ips }}"
+  vars:
+    msg_header: |-
+      Server '{{ inventory_hostname }}' access details:
+      {{ _pxe_os.desc }}, root, {{ _install_conf.rootpw }}
+    msg_ips: >-
+      {{ _install_conf.net | map(attribute='ip') | map('ipaddr', 'address') | list }}
+  when: inventory_hostname in groups['new']
+
+  tags:
+    - always
