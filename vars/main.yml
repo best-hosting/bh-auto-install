@@ -11,6 +11,21 @@ _os_img: {}
 
 file_does_not_exist: "{{ '/' + 65534 | random(seed=_install_conf.name) | hash('sha1') }}"
 
+# Directory, where pxelinux.0 is installed. Default value is location for OS
+# syslinux package from Debian. If specific syslinux version was requested,
+# syslinux archive location will be set here.
+syslinux_pxelinux_0_file: '/usr/lib/PXELINUX/pxelinux.0'
+# Directory, where syslinux modules are installed. Default value is location
+# for OS syslinux package from Debian. If specific syslinux version was
+# requested, syslinux archive location will be set here.
+syslinux_modules_dir: '/usr/lib/syslinux/modules/bios'
+
+syslinux_version_url: >-
+  {{ 'https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/'
+      + syslinux_version.partition('.') | first ... + '.xx/'
+      + 'syslinux-' + syslinux_version + '.tar.gz'
+  }}
+
 # Modules directories searched by pxelinux.0 are fixed, and may be seen as
 # tftp requests in 'daemon.log'.
 pxe_modules_path: "{{ pxe_root_path + '/syslinux' }}"

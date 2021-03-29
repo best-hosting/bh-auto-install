@@ -13,6 +13,9 @@ default_raid: false
 # Whether to use lvm by default.
 default_lvm: false
 
+# Install specific syslinux version. If empty, install version from OS.
+syslinux_version: ''
+
 # Enable or disable pxe graphical menu.
 pxe_graphical_menu: false
 
