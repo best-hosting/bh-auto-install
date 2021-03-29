@@ -244,54 +244,58 @@ user_dist_dir: "{{ user_opt_dir + '/dist' }}"
 
 # List of patterns for obtaining list of modules to be installed for
 # particular syslinux versions.
-syslinux_files:
-  { 'os' :
-      { 'module_dirs' : ['/usr/lib/syslinux/modules/bios']
-      , 'files' : ['/usr/lib/PXELINUX/pxelinux.0']
-      }
-  , '3.86' :
-      { 'module_dirs' :
-          [ 'modules/'
-          , 'com32/menu/'
-          , 'com32/modules/'
-          , 'com32/mboot/'
-          , 'com32/hdt/'
-          , 'com32/rosh/'
-          , 'com32/gfxboot/'
-          , 'com32/sysdump/'
-          ]
-      , 'files' :
-          [ 'memdisk/memdisk'
-          , 'memdump/memdump.com'
-          , 'core/pxelinux.0'
-          , 'gpxe/gpxelinux.0'
-          ]
+syslinux_files: >-
+  {{
+      { 'os' :
+          { 'module_dirs' : ['/usr/lib/syslinux/modules/bios']
+          , 'files' : ['/usr/lib/PXELINUX/pxelinux.0']
+          }
+
+      , '3.86' :
+          { 'module_dirs' :
+              [ 'modules/'
+              , 'com32/menu/'
+              , 'com32/modules/'
+              , 'com32/mboot/'
+              , 'com32/hdt/'
+              , 'com32/rosh/'
+              , 'com32/gfxboot/'
+              , 'com32/sysdump/'
+              ]
+          , 'files' :
+              [ 'memdisk/memdisk'
+              , 'memdump/memdump.com'
+              , 'core/pxelinux.0'
+              , 'gpxe/gpxelinux.0'
+              ]
+          , 'pxe_modules_path': pxe_root_path
+          }
+
+      , '6.03' :
+          { 'module_dirs' :
+              [ 'bios/com32/menu/'
+              , 'bios/com32/modules/'
+              , 'bios/com32/mboot/'
+              , 'bios/com32/hdt/'
+              , 'bios/com32/rosh/'
+              , 'bios/com32/gfxboot/'
+              , 'bios/com32/sysdump/'
+              , 'bios/com32/lua/src/'
+              , 'bios/com32/chain/'
+              , 'bios/com32/lib/'
+              , 'bios/com32/libutil/'
+              , 'bios/com32/gpllib/'
+              , 'bios/com32/elflink/ldlinux/'
+              , 'bios/com32/cmenu/libmenu/'
+              ]
+          , 'files' :
+              [ 'bios/core/pxelinux.0'
+              , 'bios/gpxe/gpxelinux.0'
+              , 'bios/core/lpxelinux.0'
+              , 'bios/memdisk/memdisk'
+              ]
+          }
       }
 
-  , '6.03' :
-      { 'module_dirs' :
-          [ 'bios/com32/menu/'
-          , 'bios/com32/modules/'
-          , 'bios/com32/mboot/'
-          , 'bios/com32/hdt/'
-          , 'bios/com32/rosh/'
-          , 'bios/com32/gfxboot/'
-          , 'bios/com32/sysdump/'
-          , 'bios/com32/lua/src/'
-          , 'bios/com32/chain/'
-          , 'bios/com32/lib/'
-          , 'bios/com32/libutil/'
-          , 'bios/com32/gpllib/'
-          , 'bios/com32/elflink/ldlinux/'
-          , 'bios/com32/cmenu/libmenu/'
-          ]
-      , 'files' :
-          [ 'bios/core/pxelinux.0'
-          , 'bios/gpxe/gpxelinux.0'
-          , 'bios/core/lpxelinux.0'
-          , 'bios/memdisk/memdisk'
-          ]
-      }
-  }
-
+  }}
 

@@ -120,9 +120,12 @@
     - name: pxe (pxe_server) | Copy syslinux modules
       copy:
         src:  "{{ item.path }}"
-        dest: "{{ pxe_modules_path + '/' + item.path | basename }}"
+        dest: "{{ item_mod_path + '/' + item.path | basename }}"
         remote_src: yes
       loop: "{{ syslinux_modules_found.files }}"
+      vars:
+        item_mod_path: >-
+          {{ syslinux_files[_syslinux_pkg.version].pxe_modules_path | default(pxe_modules_path) }}
 
   delegate_to: "{{ _pxe_server }}"
 
