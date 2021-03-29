@@ -47,6 +47,7 @@ pxe_menu_colors:
   - 'MENU COLOR help          37;40 #c0ffffff #00000000 std'
   - 'MENU COLOR msg07         37;40 #90ffffff #00000000 std'
 
+pxe_menu_title: "BH pxe"
 # File with additional pxe menus to include at the end.
 addon_pxe_menus_file: "{{ playbook_dir + '/addon_pxe_menus.cfg' }}"
 

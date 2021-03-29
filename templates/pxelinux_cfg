@@ -17,7 +17,7 @@ MENU BACKGROUND splash.png
 {% endif %}
 {{ pxe_menu_colors | join('\n') }}
 
-MENU TITLE BH pxe
+MENU TITLE {{ pxe_menu_title }}
 
 {% for menu in _pxe_menus.keys() %}
 
