@@ -1,0 +1,84 @@
+---
+
+- block:
+    - name: pxe (pxe_server) | Install tftpd package
+      package:
+        name:
+          - 'tftpd-hpa'
+        state: present
+
+    - name: pxe (pxe_server) | Ensure pxe directories exist
+      file:
+        dest: "{{ item }}"
+        state: directory
+      loop:
+        - "{{ pxe_root_path }}"
+        - "{{ pxe_modules_path }}"
+        - "{{ pxe_root_path + '/pxelinux.cfg' }}"
+      notify:
+        - restart tftpd
+
+    - name: pxe (pxe_server) | Set pxe root directory in tftp server
+      lineinfile:
+        path: '/etc/default/tftpd-hpa'
+        backup: yes
+        regexp: '^TFTP_DIRECTORY='
+        line: "{{ 'TFTP_DIRECTORY=\"' + pxe_root_path + '\"' }}"
+      notify:
+        - restart tftpd
+
+    - name: pxe (pxe_server) | Set tftp server listen address
+      lineinfile:
+        path: '/etc/default/tftpd-hpa'
+        backup: yes
+        regexp: '^TFTP_ADDRESS='
+        line: "{{ 'TFTP_ADDRESS=\"' + hostvars[_pxe_server]._tftp_address + '\"' }}"
+      notify:
+        - restart tftpd
+
+  delegate_to: "{{ _pxe_server }}"
+
+- name: pxe (pxe_server) | Install pxelinux packages from OS
+  package:
+    name:
+      - 'pxelinux'
+      - 'syslinux-common'
+    state: present
+
+  when: syslinux_version == ''
+  delegate_to: "{{ _pxe_server }}"
+
+- block:
+    - name: pxe (pxe_server) | ..or specific syslinux version
+      debug:
+        var: syslinux_version_url
+
+    - name:
+      assert:
+        that:
+          - 1 == 2
+
+  when: syslinux_version != ''
+  delegate_to: "{{ _pxe_server }}"
+
+- block:
+    - name: pxe (pxe_server) | Copy pxelinux.0
+      copy:
+        src:  "{{ syslinux_pxelinux_0_file }}"
+        dest: "{{ pxe_root_path + '/' + item | basename }}"
+        remote_src: yes
+
+    - name: pxe (pxe_server) | Find syslinux modules
+      find:
+        paths: "{{ syslinux_modules_dir }}"
+      register: syslinux_modules
+
+    - name: pxe (pxe_server) | Copy syslinux modules
+      copy:
+        src:  "{{ item.path }}"
+        dest: "{{ pxe_modules_path + '/' + item.path | basename }}"
+        remote_src: yes
+      loop: "{{ syslinux_modules.files }}"
+
+  delegate_to: "{{ _pxe_server }}"
+
