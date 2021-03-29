@@ -1,15 +1,39 @@
 ---
 
-- name: pxe (pxe_server) | Ensure pxe directories exist
-  file:
-    dest: "{{ item }}"
-    state: directory
-  loop:
-    - "{{ pxe_root_path }}"
-    - "{{ pxe_modules_path }}"
-    - "{{ pxe_root_path + '/pxelinux.cfg' }}"
-  notify:
-    - restart tftpd
+- block:
+    - name: pxe (pxe_server) | Install tftpd package
+      package:
+        name:
+          - 'tftpd-hpa'
+        state: present
+
+    - name: pxe (pxe_server) | Ensure tftpd directories exist
+      file:
+        dest: "{{ item }}"
+        state: directory
+      loop:
+        - "{{ pxe_root_path }}"
+      notify:
+        - restart tftpd
+
+    - name: pxe (pxe_server) | Set pxe root directory in tftp server
+      lineinfile:
+        path: '/etc/default/tftpd-hpa'
+        backup: yes
+        regexp: '^TFTP_DIRECTORY='
+        line: "{{ 'TFTP_DIRECTORY=\"' + pxe_root_path + '\"' }}"
+      notify:
+        - restart tftpd
+
+    - name: pxe (pxe_server) | Set tftp server listen address
+      lineinfile:
+        path: '/etc/default/tftpd-hpa'
+        backup: yes
+        regexp: '^TFTP_ADDRESS='
+        line: "{{ 'TFTP_ADDRESS=\"' + hostvars[_pxe_server]._tftp_address + '\"' }}"
+      notify:
+        - restart tftpd
+
   delegate_to: "{{ _pxe_server }}"
 
 - name: pxe (pxe_server) | Install pxelinux packages from OS or..
@@ -77,74 +101,28 @@
           }}
       register: syslinux_files_found
 
-    - name:
-      debug:
-        msg: >-
-          {{ item.path }}
-      loop: "{{ item_files + syslinux_modules_found.files }}"
-      vars:
-        item_files: >-
-          {{ syslinux_files_found.results | map(attribute='stat') | selectattr('exists') | list }}
+    - name: pxe (pxe_server) | Ensure pxe directories exist
+      file:
+        dest: "{{ item }}"
+        state: directory
+      loop:
+        - "{{ pxe_modules_path }}"
+        - "{{ pxe_root_path + '/pxelinux.cfg' }}"
+
+    - name: pxe (pxe_server) | Copy syslinux files
+      copy:
+        src:  "{{ item.path }}"
+        dest: "{{ pxe_root_path + '/' + item.path | basename }}"
+        remote_src: yes
+      loop: >-
+        {{ syslinux_files_found.results | map(attribute='stat') | selectattr('exists') | list }}
 
     - name: pxe (pxe_server) | Copy syslinux modules
       copy:
         src:  "{{ item.path }}"
         dest: "{{ pxe_modules_path + '/' + item.path | basename }}"
         remote_src: yes
-      loop: "{{ syslinux_modules.files }}"
-      loop: "{{ item_files + syslinux_modules_found.files }}"
-      vars:
-        item_files: >-
-          {{ syslinux_files_found.results | map(attribute='stat') | selectattr('exists') | list }}
-
-  delegate_to: "{{ _pxe_server }}"
-
-- name:
-  assert:
-    that:
-      - 1 == 2
-
-
-
-
-
-
-
-- block:
-    - name: pxe (pxe_server) | Install tftpd package
-      package:
-        name:
-          - 'tftpd-hpa'
-        state: present
-
-    - name: pxe (pxe_server) | Ensure pxe directories exist
-      file:
-        dest: "{{ item }}"
-        state: directory
-      loop:
-        - "{{ pxe_root_path }}"
-        - "{{ pxe_modules_path }}"
-        - "{{ pxe_root_path + '/pxelinux.cfg' }}"
-      notify:
-        - restart tftpd
-
-    - name: pxe (pxe_server) | Set pxe root directory in tftp server
-      lineinfile:
-        path: '/etc/default/tftpd-hpa'
-        backup: yes
-        regexp: '^TFTP_DIRECTORY='
-        line: "{{ 'TFTP_DIRECTORY=\"' + pxe_root_path + '\"' }}"
-      notify:
-        - restart tftpd
-
-    - name: pxe (pxe_server) | Set tftp server listen address
-      lineinfile:
-        path: '/etc/default/tftpd-hpa'
-        backup: yes
-        regexp: '^TFTP_ADDRESS='
-        line: "{{ 'TFTP_ADDRESS=\"' + hostvars[_pxe_server]._tftp_address + '\"' }}"
-      notify:
-        - restart tftpd
+      loop: "{{ syslinux_modules_found.files }}"
 
   delegate_to: "{{ _pxe_server }}"
 
