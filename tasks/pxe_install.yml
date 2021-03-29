@@ -64,9 +64,11 @@
 - block:
     - name: pxe (pxe_server) | Copy pxelinux.0
       copy:
-        src:  "{{ syslinux_pxelinux_0_file }}"
+        src:  "{{ item }}"
         dest: "{{ pxe_root_path + '/' + item | basename }}"
         remote_src: yes
+      vars:
+        item: "{{ syslinux_pxelinux_0_file }}"
 
     - name: pxe (pxe_server) | Find syslinux modules
       find:

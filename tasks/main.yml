@@ -27,7 +27,8 @@
 - name: Install syslinux
   import_tasks: pxe_install.yml
   tags:
-    - pxe_install
+    - install_pxe
+    - pxe
 
 - name: Configure pxe.
   import_tasks: pxe.yml
