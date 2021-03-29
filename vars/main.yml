@@ -37,7 +37,7 @@ syslinux_version_dir: >-
 
 # Modules directories searched by pxelinux.0 are fixed, and may be seen as
 # tftp requests in 'daemon.log'.
-pxe_modules_path: "{{ pxe_root_path + '/syslinux' }}"
+pxe_modules_path: "{{ pxe_root_path + '/syslinux-' + _syslinux_pkg.version }}"
 
 # Hosts pxe menu name used in 'pxe_menus' dictionary.
 hosts_pxe_menu: 'hosts'

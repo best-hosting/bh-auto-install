@@ -36,31 +36,26 @@
     - name: define | Define syslinux version config
       set_fact:
         _syslinux_pkg: >-
-          {{  { 'version' : ''
+          {{  { 'version' : 'os'
               , 'url' : item_url
               } | combine(syslinux_pkg, item_pathes)
           }}
       vars:
         item_version: >-
-          {{ syslinux_pkg.version | default('') }}
+          {{ syslinux_pkg.version | default('os') }}
         item_url: >-
           {{ 'https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/'
                 + item_version.partition('.') | first + '.xx/'
                 + 'syslinux-' + item_version + '.tar.gz'
-              if item_version != ''
+              if item_version != 'os'
               else ''
           }}
         item_pathes: >-
           {{  { 'archive_file': user_dist_dir + '/syslinux-' + item_version + '.tar.gz'
               , 'extract_dir' : user_dist_dir
               , 'archive_dir' : user_dist_dir + '/syslinux-' + item_version
-              , 'pxelinux_0'  : 'huy'
-              , 'modules_dir' : 'huynya'
-              } if item_version != ''
-              else
-                { 'pxelinux_0'  : '/usr/lib/PXELINUX/pxelinux.0'
-                , 'modules_dir' : '/usr/lib/syslinux/modules/bios'
-                }
+              } if item_version != 'os'
+              else {}
           }}
 
     - name: define | Show syslinux package info
