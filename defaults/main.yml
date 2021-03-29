@@ -14,7 +14,7 @@ default_raid: false
 default_lvm: false
 
 # Install specific syslinux version. If empty, install version from OS.
-syslinux_version: ''
+syslinux_pkg: {}
 
 # Enable or disable pxe graphical menu.
 pxe_graphical_menu: false
@@ -232,3 +232,11 @@ pxe_menus:
 # menus and placed (when assembled) in 'pxelinux_incl_dir'.
 
 force_overwrite: false
+
+# Directory, where to unpack programs (which can't be properly installed into
+# ~/.local). Since this role will most likely require 'root', set this to root
+# home.
+user_opt_dir: "{{ '/root/opt' }}"
+
+# Directory, where to download and save locally installed programs and files.
+user_dist_dir: "{{ user_opt_dir + '/dist' }}"

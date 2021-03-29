@@ -1,6 +1,37 @@
 ---
 
 - block:
+    - name: pxe (pxe_server) | Ensure user_dist directories exist
+      file:
+        dest: "{{ user_dist_dir }}"
+        state: directory
+
+    - name: pxe (pxe_server) | Download syslinux version archive
+      get_url:
+        url:  "{{ _syslinux_pkg.url }}"
+        dest: "{{ _syslinux_pkg.archive_file }}"
+        force: "{{ force_overwrite }}"
+      register: syslinux_version_download
+
+    - name: pxe (pxe_server) | Unpack syslinux version archive
+      unarchive:
+        src:  "{{ _syslinux_pkg.archive_file }}"
+        dest: "{{ _syslinux_pkg.archive_dir }}"
+        remote_src: yes
+        creates: >-
+          {{ ( force_overwrite or syslinux_version_download.changed )
+              | ternary(file_does_not_exist, syslinux_modules_dir + '/core/pxelinux.0')
+          }}
+
+    - name:
+      assert:
+        that:
+          - 1 == 2
+
+  when: _syslinux_pkg.version != ''
+  delegate_to: "{{ _pxe_server }}"
+
+- block:
     - name: pxe (pxe_server) | Install tftpd package
       package:
         name:
@@ -45,20 +76,7 @@
       - 'syslinux-common'
     state: present
 
-  when: syslinux_version == ''
-  delegate_to: "{{ _pxe_server }}"
-
-- block:
-    - name: pxe (pxe_server) | ..or specific syslinux version
-      debug:
-        var: syslinux_version_url
-
-    - name:
-      assert:
-        that:
-          - 1 == 2
-
-  when: syslinux_version != ''
+  when: _syslinux_pkg.version == ''
   delegate_to: "{{ _pxe_server }}"
 
 - block:
@@ -68,11 +86,11 @@
         dest: "{{ pxe_root_path + '/' + item | basename }}"
         remote_src: yes
       vars:
-        item: "{{ syslinux_pxelinux_0_file }}"
+        item: "{{ _syslinux_pkg.pxelinux_0 }}"
 
     - name: pxe (pxe_server) | Find syslinux modules
       find:
-        paths: "{{ syslinux_modules_dir }}"
+        paths: "{{ _syslinux_pkg.modules_dir }}"
       register: syslinux_modules
 
     - name: pxe (pxe_server) | Copy syslinux modules

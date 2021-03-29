@@ -20,11 +20,20 @@ syslinux_pxelinux_0_file: '/usr/lib/PXELINUX/pxelinux.0'
 # requested, syslinux archive location will be set here.
 syslinux_modules_dir: '/usr/lib/syslinux/modules/bios'
 
+# URL for downloading syslinux version from.
 syslinux_version_url: >-
   {{ 'https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/'
-      + syslinux_version.partition('.') | first ... + '.xx/'
+      + syslinux_version.partition('.') | first + '.xx/'
       + 'syslinux-' + syslinux_version + '.tar.gz'
   }}
+
+# Name of syslinux version archive.
+syslinux_version_archive: >-
+  {{ 'syslinux-' + syslinux_version + '.tar.gz' }}
+
+# Name of unpacked syslinux version directory.
+syslinux_version_dir: >-
+  {{ 'syslinux-' + syslinux_version }}
 
 # Modules directories searched by pxelinux.0 are fixed, and may be seen as
 # tftp requests in 'daemon.log'.
@@ -40,3 +49,4 @@ addon_pxe_menus_cfg: >-
 
 # Internal pxe_menus dictionary.
 _pxe_menus: {}
+

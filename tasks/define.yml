@@ -33,6 +33,39 @@
         - '_pxelinux_cfg'
         - '_pxelinux_incl_dir'
 
+    - name: define | Define syslinux version config
+      set_fact:
+        _syslinux_pkg: >-
+          {{  { 'version' : ''
+              , 'url' : item_url
+              } | combine(syslinux_pkg, item_pathes)
+          }}
+      vars:
+        item_version: >-
+          {{ syslinux_pkg.version | default('') }}
+        item_url: >-
+          {{ 'https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux/'
+                + item_version.partition('.') | first + '.xx/'
+                + 'syslinux-' + item_version + '.tar.gz'
+              if item_version != ''
+              else ''
+          }}
+        item_pathes: >-
+          {{  { 'archive_file' : user_dist_dir + '/syslinux-' + item_version + '.tar.gz'
+              , 'archive_dir'  : user_dist_dir
+              , 'pxelinux_0'  : 'huy'
+              , 'modules_dir' : 'huynya'
+              } if item_version != ''
+              else
+                { 'pxelinux_0'  : '/usr/lib/PXELINUX/pxelinux.0'
+                , 'modules_dir' : '/usr/lib/syslinux/modules/bios'
+                }
+          }}
+
+    - name: define | Show syslinux package info
+      debug:
+        var: _syslinux_pkg
+
 - block:
     - name: define | Define pxe menus config
       set_fact:
