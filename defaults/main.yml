@@ -240,3 +240,23 @@ user_opt_dir: "{{ '/root/opt' }}"
 
 # Directory, where to download and save locally installed programs and files.
 user_dist_dir: "{{ user_opt_dir + '/dist' }}"
+
+# List of patterns for obtaining list of modules to be installed for
+# particular syslinux versions.
+syslinux_versions: >-
+  { '3.86' :
+      'modules':
+        - 'memdisk/memdisk'
+        - 'memdump/memdump.com'
+        - 'modules/*.com'
+        - 'com32/menu/*.c32'
+        - 'com32/modules/*.c32'
+        - 'com32/mboot/*.c32'
+        - 'com32/hdt/*.c32'
+        - 'com32/rosh/*.c32'
+        - 'com32/gfxboot/*.c32'
+        - 'com32/sysdump/*.c32'
+      'pxelinux_0' : 'core/pxelinux.0'
+  }
+
+

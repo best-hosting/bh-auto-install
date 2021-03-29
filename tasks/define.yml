@@ -51,8 +51,9 @@
               else ''
           }}
         item_pathes: >-
-          {{  { 'archive_file' : user_dist_dir + '/syslinux-' + item_version + '.tar.gz'
-              , 'archive_dir'  : user_dist_dir
+          {{  { 'archive_file': user_dist_dir + '/syslinux-' + item_version + '.tar.gz'
+              , 'extract_dir' : user_dist_dir
+              , 'archive_dir' : user_dist_dir + '/syslinux-' + item_version
               , 'pxelinux_0'  : 'huy'
               , 'modules_dir' : 'huynya'
               } if item_version != ''

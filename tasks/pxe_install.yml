@@ -16,11 +16,11 @@
     - name: pxe (pxe_server) | Unpack syslinux version archive
       unarchive:
         src:  "{{ _syslinux_pkg.archive_file }}"
-        dest: "{{ _syslinux_pkg.archive_dir }}"
+        dest: "{{ _syslinux_pkg.extract_dir }}"
         remote_src: yes
         creates: >-
           {{ ( force_overwrite or syslinux_version_download.changed )
-              | ternary(file_does_not_exist, syslinux_modules_dir + '/core/pxelinux.0')
+              | ternary(file_does_not_exist, _syslinux_pkg.archive_dir + '/README')
           }}
 
     - name:
@@ -30,6 +30,46 @@
 
   when: _syslinux_pkg.version != ''
   delegate_to: "{{ _pxe_server }}"
+
+- name: pxe (pxe_server) | Install pxelinux packages from OS
+  package:
+    name:
+      - 'pxelinux'
+      - 'syslinux-common'
+    state: present
+
+  when: _syslinux_pkg.version == ''
+  delegate_to: "{{ _pxe_server }}"
+
+- block:
+    - name: pxe (pxe_server) | Copy pxelinux.0
+      copy:
+        src:  "{{ item }}"
+        dest: "{{ pxe_root_path + '/' + item | basename }}"
+        remote_src: yes
+      vars:
+        item: "{{ _syslinux_pkg.pxelinux_0 }}"
+
+    - name: pxe (pxe_server) | Find syslinux modules
+      find:
+        paths: "{{ _syslinux_pkg.modules_dir }}"
+      register: syslinux_modules
+
+    - name: pxe (pxe_server) | Copy syslinux modules
+      copy:
+        src:  "{{ item.path }}"
+        dest: "{{ pxe_modules_path + '/' + item.path | basename }}"
+        remote_src: yes
+      loop: "{{ syslinux_modules.files }}"
+
+  delegate_to: "{{ _pxe_server }}"
+
+
+
+
+
+
+
 
 - block:
     - name: pxe (pxe_server) | Install tftpd package
@@ -66,39 +106,6 @@
         line: "{{ 'TFTP_ADDRESS=\"' + hostvars[_pxe_server]._tftp_address + '\"' }}"
       notify:
         - restart tftpd
-
-  delegate_to: "{{ _pxe_server }}"
-
-- name: pxe (pxe_server) | Install pxelinux packages from OS
-  package:
-    name:
-      - 'pxelinux'
-      - 'syslinux-common'
-    state: present
-
-  when: _syslinux_pkg.version == ''
-  delegate_to: "{{ _pxe_server }}"
-
-- block:
-    - name: pxe (pxe_server) | Copy pxelinux.0
-      copy:
-        src:  "{{ item }}"
-        dest: "{{ pxe_root_path + '/' + item | basename }}"
-        remote_src: yes
-      vars:
-        item: "{{ _syslinux_pkg.pxelinux_0 }}"
-
-    - name: pxe (pxe_server) | Find syslinux modules
-      find:
-        paths: "{{ _syslinux_pkg.modules_dir }}"
-      register: syslinux_modules
-
-    - name: pxe (pxe_server) | Copy syslinux modules
-      copy:
-        src:  "{{ item.path }}"
-        dest: "{{ pxe_modules_path + '/' + item.path | basename }}"
-        remote_src: yes
-      loop: "{{ syslinux_modules.files }}"
 
   delegate_to: "{{ _pxe_server }}"
 
