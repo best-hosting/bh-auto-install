@@ -49,7 +49,7 @@
       {{ _pxe_os.desc }}, root, {{ _install_conf.rootpw }}
     msg_ips: >-
       {{ _install_conf.net | map(attribute='ip') | map('ipaddr', 'address') | list }}
-  when: inventory_hostname in groups['new']
+  when: inventory_hostname in groups['new'] and not inventory_hostname in groups['dummy']
 
   tags:
     - always

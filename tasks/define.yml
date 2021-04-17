@@ -74,7 +74,7 @@
               , 'vg_name' : item_name
               , 'rootpw_file' : item_rootpw_file
               , 'rootpw'  : lookup('password', item_rootpw_file + ' length=18 chars=ascii_letters,digits')
-                              if inventory_hostname in groups['new']
+                              if inventory_hostname in groups['new'] and not inventory_hostname in groups['dummy']
                               else ''
               , 'disks' : ['sda', 'sdb'] if item_raid else ['sda']
               , 'gen_ks' : true
