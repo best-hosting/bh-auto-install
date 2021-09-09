@@ -66,13 +66,16 @@
 # `new` group and delete for hosts in `installed` group. Hosts in other groups
 # are _ignored_.
 
-- block:
-    - name: pxe (pxe_server) | Ensure pxe menu config directories exist
-      file:
-        dest:   "{{ item.cfg_d }}"
-        state:  directory
-      loop: "{{ _pxe_menus.values() }}"
+- name: pxe (pxe_server) | Ensure pxe menu config directories exist
+  file:
+    dest:   "{{ item.cfg_d }}"
+    state:  directory
+  loop: "{{ _pxe_menus.values() }}"
+  delegate_to: "{{ _pxe_server }}"
+  tags:
+    - pxe_host
 
+- block:
     - name: pxe (pxe_server) | Create config for host OS
       template:
         src:  "pxe_os.cfg"

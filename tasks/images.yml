@@ -72,6 +72,7 @@
       debug:
         var: _os_img
 
+  when: inventory_hostname in groups['servers']
   delegate_to: localhost
 
 - block:
@@ -151,5 +152,6 @@
           when: item.path != _os_img.file
           loop: "{{ image_files.files }}"
 
+  when: inventory_hostname in groups['servers']
   delegate_to: "{{ _pxe_server }}"
 

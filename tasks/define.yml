@@ -176,3 +176,5 @@
       debug:
         var: _pxe_os
 
+  when: inventory_hostname in groups['servers']
+
