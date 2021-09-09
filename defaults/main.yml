@@ -225,4 +225,7 @@ pxe_menus:
 # from ansible template. They'll be later assembled into 'hosts' and os pxe
 # menus and placed (when assembled) in 'pxelinux_incl_dir'.
 
+# 'ks_root_path': root www path served by kickstart web server.
+# 'ks_address': IP address of kickstart web server.
+
 force_overwrite: false

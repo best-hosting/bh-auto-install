@@ -4,3 +4,7 @@
 - name: restart tftpd
   service: name=tftpd-hpa state=restarted
   delegate_to: "{{ _pxe_server }}"
+
+- name: restart nginx
+  service: name=nginx state=restarted
+  delegate_to: "{{ _kickstart_server }}"

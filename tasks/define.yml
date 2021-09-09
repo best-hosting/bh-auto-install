@@ -34,12 +34,22 @@
         - '_pxelinux_incl_dir'
 
 - block:
-    - name: define (pxe_server) | Define kickstart server config
+    # I should first check, and then convert (next task, particularly this is
+    # about ip address). Otherwise, i may start converting unknown data.
+    - name: define (kickstart_server) | Check kickstart server config
+      assert:
+        that:
+          - hostvars[_kickstart_server].ks_address | ipaddr
+
+    - name: define (kickstart_server) | Define kickstart server config
       set_fact:
-        _ks_www_root: >-
-          {{ hostvars[_kickstart_server].ks_www_root | default('/srv/www') }}
-        _ks_www_addr: >-
-          {{ hostvars[_kickstart_server].ks_www_addr }}
+        _ks_root_path: >-
+          {{ hostvars[_kickstart_server].ks_root_path | default('/srv/www') }}
+        _ks_address: >-
+          {{ item_ks_address }}
+      vars:
+        item_ks_address: >-
+          {{ hostvars[_kickstart_server].ks_address | ipaddr('address') }}
       delegate_facts: true
       delegate_to: "{{ _kickstart_server }}"
 
@@ -47,8 +57,8 @@
       debug:
         msg: "{{ item + ': ' + hostvars[_kickstart_server][item] }}"
       loop:
-        - '_ks_www_root'
-        - '_ks_www_addr'
+        - '_ks_root_path'
+        - '_ks_address'
 
 - block:
     - name: define | Define pxe menus config
@@ -85,6 +95,7 @@
     - name: define | Define OS install config
       set_fact:
         _pxe_root_path: "{{ hostvars[_pxe_server]._pxe_root_path }}"
+        _ks_root_path: "{{ hostvars[_kickstart_server]._ks_root_path }}"
         _install_conf: >-
           {{  { 'raid': default_raid
               , 'lvm' : default_lvm
@@ -99,8 +110,8 @@
               } | combine(install_conf,
                     { 'name'    : item_name
                     , 'pxe_cfg' : _pxe_menus[hosts_pxe_menu].cfg_d + '/50_' + item_name + '.cfg'
-                    , 'ks_cfg'  : hostvars[_kickstart_server]._ks_www_root + '/' + item_name + '.cfg'
-                    , 'ks_www'  : hostvars[_kickstart_server]._ks_www_addr + '/' + item_name + '.cfg'
+                    , 'ks_cfg'  : hostvars[_kickstart_server]._ks_root_path + '/' + item_name + '.cfg'
+                    , 'ks_url'  : 'http://' + hostvars[_kickstart_server]._ks_address + '/' + item_name + '.cfg'
                     }
                   )
           }}

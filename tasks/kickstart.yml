@@ -1,5 +1,41 @@
 ---
 
+- block:
+    - name: kickstart (kickstart server) | Install
+      package:
+        name: 'nginx'
+        state: present
+
+    - name: kickstart (kickstart server) | Ensure nginx directories exist
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - "{{ _ks_root_path }}"
+        - '/etc/nginx/sites-available'
+        - '/etc/nginx/sites-enabled'
+
+    - name: kickstart (kickstart server) | Create kickstart server nginx vhost
+      template:
+        src:  "ks_nginx_vhost.cfg"
+        force:  yes
+        backup: yes
+        dest: "{{ '/etc/nginx/sites-available/' + _kickstart_server }}"
+      notify:
+        - restart nginx
+
+    - name: kickstart (kickstart server) | Enable kickstart server nginx vhost
+      file:
+        src:  "{{ '/etc/nginx/sites-available/' + _kickstart_server }}"
+        dest: "{{ '/etc/nginx/sites-enabled/' + _kickstart_server }}"
+        state: link
+      notify:
+        - restart nginx
+
+  delegate_to: "{{ kickstart_server }}"
+  tags:
+    - install_nginx
+
 # Enforce correct state of kickstart and pxe host configs: create for hosts in
 # `new` group and delete for hosts in `installed` group. Hosts in other groups
 # are _ignored_.
@@ -7,12 +43,12 @@
     # FIXME: I need to set properly kickstart server variables the same way,
     # as i do for pxe server.
     # FIXME: Set up www server itself.
-    - name: kickstart | Ensure www root directory exists
+    - name: kickstart (kickstart server) | Ensure www root directory exists
       file:
-        dest: "{{ hostvars[_kickstart_server]._ks_www_root }}"
+        dest: "{{ _ks_root_path }}"
         state: directory
 
-    - name: kickstart | Create config for new hosts
+    - name: kickstart (kickstart server) | Create config for new hosts
       template:
         src: "{{ _install_conf.os }}.cfg"
         force: yes
@@ -21,7 +57,7 @@
         dest: "{{ _install_conf.ks_cfg }}"
       when: _install_conf.gen_ks and inventory_hostname in groups['new']
 
-    - name: kickstart | Delete config for _already_ installed hosts
+    - name: kickstart (kickstart server) | Delete config for _already_ installed hosts
       file:
         dest: "{{ _install_conf.ks_cfg }}"
         state: absent
