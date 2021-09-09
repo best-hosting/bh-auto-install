@@ -4,6 +4,14 @@
 # `new` group and delete for hosts in `installed` group. Hosts in other groups
 # are _ignored_.
 - block:
+    # FIXME: I need to set properly kickstart server variables the same way,
+    # as i do for pxe server.
+    # FIXME: Set up www server itself.
+    - name: kickstart | Ensure www root directory exists
+      file:
+        dest: "{{ hostvars[_kickstart_server].ks_www_root }}"
+        state: directory
+
     - name: kickstart | Create config for new hosts
       template:
         src: "{{ _install_conf.os }}.cfg"
