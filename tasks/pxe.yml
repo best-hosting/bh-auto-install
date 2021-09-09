@@ -14,9 +14,9 @@
         dest: "{{ item }}"
         state: directory
       loop:
-        - "{{ pxe_root_path }}"
-        - "{{ pxe_modules_path }}"
-        - "{{ pxe_root_path + '/pxelinux.cfg' }}"
+        - "{{ _pxe_root_path }}"
+        - "{{ _pxe_modules_path }}"
+        - "{{ _pxe_root_path + '/pxelinux.cfg' }}"
       notify:
         - restart tftpd
 
@@ -25,7 +25,7 @@
         path: '/etc/default/tftpd-hpa'
         backup: yes
         regexp: '^TFTP_DIRECTORY='
-        line: "{{ 'TFTP_DIRECTORY=\"' + pxe_root_path + '\"' }}"
+        line: "{{ 'TFTP_DIRECTORY=\"' + _pxe_root_path + '\"' }}"
       notify:
         - restart tftpd
 
@@ -41,7 +41,7 @@
     - name: pxe (pxe_server) | Copy pxelinux.0
       copy:
         src:  "{{ item }}"
-        dest: "{{ pxe_root_path + '/' + item | basename }}"
+        dest: "{{ _pxe_root_path + '/' + item | basename }}"
         remote_src: yes
       vars:
         item: '/usr/lib/PXELINUX/pxelinux.0'
@@ -54,7 +54,7 @@
     - name: pxe (pxe_server) | Copy syslinux modules
       copy:
         src:  "{{ item.path }}"
-        dest: "{{ pxe_modules_path + '/' + item.path | basename }}"
+        dest: "{{ _pxe_modules_path + '/' + item.path | basename }}"
         remote_src: yes
       loop: "{{ syslinux_modules.files }}"
 
@@ -119,7 +119,7 @@
     - name: pxe (pxe_server) | Copy additional files used in pxelinux config
       copy:
         src:  "{{ item.stat.path }}"
-        dest: "{{ pxe_root_path + '/' + item.stat.path | basename }}"
+        dest: "{{ _pxe_root_path + '/' + item.stat.path | basename }}"
       when: item.stat.exists
       loop: "{{ addon_pxe_files.results }}"
 
@@ -127,14 +127,14 @@
       assemble:
         src: "{{ item.cfg_d }}"
         regexp: "[0-9]_[^/]+\\.cfg$"
-        dest: "{{ pxe_root_path + '/' + item.cfg }}"
+        dest: "{{ _pxe_root_path + '/' + item.cfg }}"
         backup: yes
       loop: "{{ _pxe_menus.values() }}"
 
     - name: pxe (pxe_server) | Copy additional pxe menus config file
       copy:
         src:  "{{ item }}"
-        dest: "{{ pxe_root_path + '/' + addon_pxe_menus_cfg }}"
+        dest: "{{ _pxe_root_path + '/' + addon_pxe_menus_cfg }}"
       vars:
         item: >-
           {{ lookup('first_found', [addon_pxe_menus_file, 'files/addon_pxe_menus']) }}
@@ -142,7 +142,7 @@
     - name: pxe (pxe_server) | Generate main pxelinux config
       template:
         src:  'pxelinux_cfg'
-        dest: "{{ pxe_root_path + '/pxelinux.cfg/default' }}"
+        dest: "{{ _pxe_root_path + '/pxelinux.cfg/default' }}"
         force: yes
         backup: yes
 

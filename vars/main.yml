@@ -13,7 +13,7 @@ file_does_not_exist: "{{ '/' + 65534 | random(seed=_install_conf.name) | hash('s
 
 # Modules directories searched by pxelinux.0 are fixed, and may be seen as
 # tftp requests in 'daemon.log'.
-pxe_modules_path: "{{ pxe_root_path + '/syslinux' }}"
+_pxe_modules_path: "{{ _pxe_root_path + '/syslinux' }}"
 
 # Hosts pxe menu name used in 'pxe_menus' dictionary.
 hosts_pxe_menu: 'hosts'

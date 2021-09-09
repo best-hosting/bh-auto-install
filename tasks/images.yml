@@ -29,7 +29,7 @@
           }}
       vars:
         cur_dest_dir: >-
-          {{ pxe_root_path + '/' + _pxe_os.pxe_dir }}
+          {{ _pxe_root_path + '/' + _pxe_os.pxe_dir }}
         checksum_data: >-
           {{ lookup('file', _pxe_os.checksum_file) }}
         cur_name: >-

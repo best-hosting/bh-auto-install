@@ -67,7 +67,7 @@
 - block:
     - name: define | Define OS install config
       set_fact:
-        pxe_root_path: "{{ hostvars[_pxe_server]._pxe_root_path }}"
+        _pxe_root_path: "{{ hostvars[_pxe_server]._pxe_root_path }}"
         _install_conf: >-
           {{  { 'raid': default_raid
               , 'lvm' : default_lvm
