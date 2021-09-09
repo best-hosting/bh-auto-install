@@ -34,6 +34,23 @@
         - '_pxelinux_incl_dir'
 
 - block:
+    - name: define (pxe_server) | Define kickstart server config
+      set_fact:
+        _ks_www_root: >-
+          {{ hostvars[_kickstart_server].ks_www_root | default('/srv/www') }}
+        _ks_www_addr: >-
+          {{ hostvars[_kickstart_server].ks_www_addr }}
+      delegate_facts: true
+      delegate_to: "{{ _kickstart_server }}"
+
+    - name: define | Show kickstart server config
+      debug:
+        msg: "{{ item + ': ' + hostvars[_kickstart_server][item] }}"
+      loop:
+        - '_ks_www_root'
+        - '_ks_www_addr'
+
+- block:
     - name: define | Define pxe menus config
       set_fact:
         _pxe_menus: >-
@@ -82,8 +99,8 @@
               } | combine(install_conf,
                     { 'name'    : item_name
                     , 'pxe_cfg' : _pxe_menus[hosts_pxe_menu].cfg_d + '/50_' + item_name + '.cfg'
-                    , 'ks_cfg'  : hostvars[_kickstart_server].ks_www_root + '/' + item_name + '.cfg'
-                    , 'ks_www'  : hostvars[_kickstart_server].ks_www_addr + '/' + item_name + '.cfg'
+                    , 'ks_cfg'  : hostvars[_kickstart_server]._ks_www_root + '/' + item_name + '.cfg'
+                    , 'ks_www'  : hostvars[_kickstart_server]._ks_www_addr + '/' + item_name + '.cfg'
                     }
                   )
           }}

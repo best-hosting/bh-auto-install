@@ -9,7 +9,7 @@
     # FIXME: Set up www server itself.
     - name: kickstart | Ensure www root directory exists
       file:
-        dest: "{{ hostvars[_kickstart_server].ks_www_root }}"
+        dest: "{{ hostvars[_kickstart_server]._ks_www_root }}"
         state: directory
 
     - name: kickstart | Create config for new hosts
