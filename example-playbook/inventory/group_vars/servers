@@ -1,0 +1,7 @@
+---
+
+pxe_server: pxe
+
+# Server, where kickstart file is located.
+kickstart_server: pxe
+

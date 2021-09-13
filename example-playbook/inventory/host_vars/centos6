@@ -1,0 +1,6 @@
+---
+
+install_conf:
+  os: 'centos6'
+  gen_ks: false
+  gen_pxe_host: false

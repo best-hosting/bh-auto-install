@@ -1,0 +1,10 @@
+---
+
+install_conf:
+  os: 'centos7'
+  raid: no
+  disks:
+    - 'vda'
+  net:
+    - ip: '192.168.1.200/24'
+      ns: '8.8.8.8'

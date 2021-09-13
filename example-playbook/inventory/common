@@ -1,0 +1,14 @@
+---
+
+# Group for hosts on which i may install something.
+servers:
+  children:
+    new:
+    installed:
+
+# Dummy group for host definitions used to update OS images (i.e. there is
+# such no real host).
+new:
+  children:
+    dummy:
+

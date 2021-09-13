@@ -1,0 +1,19 @@
+---
+
+- name: Gather facts
+  hosts: all:!servers
+
+- name: Configure bh auto install
+  hosts: all
+  gather_facts: no
+  roles:
+    - bh-auto-install
+  vars:
+    default_net: >-
+      {{  { '192.168.1.0':
+              { 'gw': '192.168.1.1'
+              , 'ns': '192.168.1.1'
+              }
+          }
+      }}
+

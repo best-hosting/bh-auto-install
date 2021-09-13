@@ -1,0 +1,30 @@
+---
+
+# Group for hosts, on which i want to install OS.
+new:
+  hosts:
+    test:
+
+# Group for hosts, on which i've already installed something.
+#installed:
+#  hosts:
+#    test2:
+
+dummy:
+  hosts:
+    debian6:
+    debian7:
+    debian8:
+    debian9:
+    debian10:
+    debian11:
+    centos6:
+    centos7:
+
+pxe_servers:
+  hosts:
+    pxe:
+
+kickstart_servers:
+  hosts:
+    pxe:

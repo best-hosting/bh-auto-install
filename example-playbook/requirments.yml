@@ -1,0 +1,5 @@
+- src: git@github.com:best-hosting/bh-auto-install.git
+  version: master
+  name: bh-auto-install
+  scm: git
+

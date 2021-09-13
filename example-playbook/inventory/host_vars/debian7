@@ -1,0 +1,6 @@
+---
+
+install_conf:
+  os: 'debian7'
+  gen_ks: false
+  gen_pxe_host: false

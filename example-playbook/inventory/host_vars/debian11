@@ -1,0 +1,6 @@
+---
+
+install_conf:
+  os: 'debian11'
+  gen_ks: false
+  gen_pxe_host: false
