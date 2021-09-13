@@ -206,6 +206,23 @@ pxe_os:
       , 'pxe_menu': 'debian'
       , 'sort_index':  10
       }
+
+  , 'debian11' :
+      { 'desc': 'Debian 11 (bullseye)'
+      , 'url' : 'http://ftp.debian.org/debian/dists/bullseye/main/installer-amd64/current/images/netboot'
+      , 'checksum_url' : 'http://ftp.debian.org/debian/dists/bullseye/main/installer-amd64/current/images'
+      , 'checksum_fn': 'SHA256SUMS'
+      , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
+      , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
+      , 'checksum_type': 'sha256'
+      , 'iso_filename_rx': 'netboot\.tar\.gz'
+      , 'iso_kernel': 'debian-installer/amd64/linux'
+      , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+      , 'pxe_append': 'vga=788 --- quiet'
+      , 'iso_type': 'archive'
+      , 'pxe_menu': 'debian'
+      , 'sort_index':  11
+      }
   }
 
 # Friendly names for pxe menus referenced from 'pxe_os'.
