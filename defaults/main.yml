@@ -73,7 +73,7 @@ pxe_os_cfg_index_offset: 30
 pxe_os:
   { 'centos6' :
       { 'desc': 'CentOS 6'
-      , 'url' : 'https://mirror.yandex.ru/centos/6/isos/x86_64'
+      , 'url' : 'https://vault.centos.org/6.10/isos/x86_64'
       , 'checksum_fn': 'sha256sum.txt.asc'
       , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
       , 'checksum_iso_name_rx': '(?<=  )CentOS-6\.[0-9]+-x86_64-netinstall\.iso$'
@@ -81,7 +81,7 @@ pxe_os:
       , 'iso_filename_rx': 'CentOS-6\.[0-9]+-x86_64-netinstall\.iso'
       , 'iso_kernel': 'images/pxeboot/vmlinuz'
       , 'iso_initrd': 'images/pxeboot/initrd.img'
-      , 'pxe_append': 'ip=dhcp repo=http://mirror.yandex.ru/centos/6/os/x86_64 lang=en_US keymap=us'
+      , 'pxe_append': 'ip=dhcp repo=https://vault.centos.org/6.10/isos/x86_64 lang=en_US keymap=us'
       , 'ks_pxe_append': 'ip=dhcp'
       , 'iso_type': 'iso'
       , 'pxe_menu': 'centos'
