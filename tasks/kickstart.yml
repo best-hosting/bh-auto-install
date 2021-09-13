@@ -32,7 +32,7 @@
       notify:
         - restart nginx
 
-  delegate_to: "{{ kickstart_server }}"
+  delegate_to: "{{ _kickstart_server }}"
   tags:
     - install_nginx
 
