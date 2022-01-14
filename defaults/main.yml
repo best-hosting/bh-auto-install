@@ -18,10 +18,12 @@ default_lvm: false
 # - 'port' - (optional) mail server port. Defaults to module default.
 # - 'secure' - (optional) whether to use ssl/starttls. Defaults to module default.
 # - 'username' - (required) smtp auth username.
-# - 'password' - (required) smtp auth password.
 # - 'to' - (optional) email recipient address. Default to 'username'.
 # - 'sender' - (optional) email sender address. Default to 'username'.
 # - 'headers' - (optional) list of additional headers. Defaults to empty list.
+# Password for smtp auth should be provided in file 'mail_passwords/username',
+# 'username' is smtp auth username specified for 'username' field, and
+# 'mail_passwords' is subdirectory of playbook directory.
 mail_report_config: {}
 
 # Enable or disable pxe graphical menu.

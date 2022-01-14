@@ -57,7 +57,7 @@
         port:   "{{ mail_report_config.port   | default(omit) }}"
         secure: "{{ mail_report_config.secure | default(omit) }}"
         username: "{{ mail_report_config.username }}"
-        password: "{{ mail_report_config.password }}"
+        password: "{{ lookup('file', 'mail_passwords/' + mail_report_config.username) }}"
         to:     "{{ mail_report_config.to     | default(mail_report_config.username) }}"
         sender: "{{ mail_report_config.sender | default(mail_report_config.username) }}"
         subject: >-
@@ -68,6 +68,7 @@
         # ' match quotes for broken highlighting.
         body: "{{ lookup('template', './templates/access_details_email.txt') }}"
         headers: "{{ mail_report_config.headers | default(omit) }}"
+      when: mail_report_config.host is defined
       run_once: true
       delegate_to: localhost
 
