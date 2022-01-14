@@ -206,3 +206,63 @@
 
   when: inventory_hostname in groups['servers']
 
+- block:
+    - name: define | Stat mail username and password file
+      stat:
+        path: "{{ mail_auth_file }}"
+      register: mail_auth_file_stats
+      delegate_to: localhost
+
+    - name: define | Read mail username and password
+      include_vars:
+        file: "{{ mail_auth_file }}"
+        name: mail_auth
+      when: mail_auth_file_stats.stat.exists
+
+    - name: define | Set mail config
+      set_fact:
+        _mail_config: >-
+          {{  merged_items
+                | combine(
+                    { 'host' : item_host
+                    , 'username' : item_username
+                    , 'password' : item_password
+                    , 'to' : item_to
+                    , 'sender' : item_sender
+                    , 'subject' : item_subject
+                    , 'body' : item_body
+                    }
+                  )
+          }}
+      vars:
+        item_host: >-
+          {{ mail_report_config.host }}
+        merged_items: >-
+          {{ mail_report_config | combine(mail_auth) }}
+        item_username: >-
+          {{ merged_items.username }}
+        item_password: >-
+          {{ merged_items.password }}
+        item_to: >-
+          {{ merged_items.to | default(item_username) }}
+        item_sender: >-
+          {{ merged_items.sender | default(item_username) }}
+        item_subject: >-
+          {{ merged_items.subject
+                | default('Ansible: Server(s) '
+                      + ansible_play_hosts | map('regex_replace', '_', '-') | join(', ')
+                      + ' access details'
+                    )
+          }}
+        # ' match quotes for broken highlighting.
+        item_body: >-
+          {{ merged_items.body
+                | default(lookup('template', './templates/access_details_email.txt'))
+          }}
+
+    - name: define | Show mail config
+      debug:
+        var: _mail_config
+
+  when: mail_report_config.host is defined
+

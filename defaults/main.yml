@@ -17,14 +17,19 @@ default_lvm: false
 # - 'host' - (required) mail server hostname.
 # - 'port' - (optional) mail server port. Defaults to module default.
 # - 'secure' - (optional) whether to use ssl/starttls. Defaults to module default.
-# - 'username' - (required) smtp auth username.
 # - 'to' - (optional) email recipient address. Default to 'username'.
 # - 'sender' - (optional) email sender address. Default to 'username'.
+# - 'subject' - (optional) message subject. See 'tasks/define.yml' for default.
+# - 'body' - (optional) message body. See 'tasks/define.yml' for default.
 # - 'headers' - (optional) list of additional headers. Defaults to empty list.
-# Password for smtp auth should be provided in file 'mail_passwords/username',
-# 'username' is smtp auth username specified for 'username' field, and
-# 'mail_passwords' is subdirectory of playbook directory.
+# Username and password for smtp auth should be provided in a yaml file
+# 'mail_auth_file' (see below).
 mail_report_config: {}
+
+# File with username and password for mail server. Aadditional fields used in
+# 'mail_report_config' may be specified here as well and will overwrite values
+# from 'mail_report_config'.
+mail_auth_file: "{{ playbook_dir + '/mail_auth.yml' }}"
 
 # Enable or disable pxe graphical menu.
 pxe_graphical_menu: false

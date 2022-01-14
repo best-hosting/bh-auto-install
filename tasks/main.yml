@@ -53,22 +53,17 @@
 
     - name: Sending all access details to email
       community.general.mail:
-        host: "{{ mail_report_config.host }}"
-        port:   "{{ mail_report_config.port   | default(omit) }}"
-        secure: "{{ mail_report_config.secure | default(omit) }}"
-        username: "{{ mail_report_config.username }}"
-        password: "{{ lookup('file', 'mail_passwords/' + mail_report_config.username) }}"
-        to:     "{{ mail_report_config.to     | default(mail_report_config.username) }}"
-        sender: "{{ mail_report_config.sender | default(mail_report_config.username) }}"
-        subject: >-
-          {{ 'Ansible: Server(s) '
-              + ansible_play_hosts | map('regex_replace', '_', '-') | join(', ')
-              + ' access details'
-          }}
-        # ' match quotes for broken highlighting.
-        body: "{{ lookup('template', './templates/access_details_email.txt') }}"
-        headers: "{{ mail_report_config.headers | default(omit) }}"
-      when: mail_report_config.host is defined
+        host: "{{ _mail_config.host }}"
+        port:   "{{ _mail_config.port   | default(omit) }}"
+        secure: "{{ _mail_config.secure | default(omit) }}"
+        username: "{{ _mail_config.username }}"
+        password: "{{ _mail_config.password }}"
+        to:     "{{ _mail_config.to }}"
+        sender: "{{ _mail_config.sender }}"
+        subject: "{{ _mail_config.subject }}"
+        body: "{{ _mail_config.body }}"
+        headers: "{{ _mail_config.headers | default(omit) }}"
+      when: _mail_config.host is defined
       run_once: true
       delegate_to: localhost
 
