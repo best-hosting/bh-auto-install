@@ -13,6 +13,17 @@ default_raid: false
 # Whether to use lvm by default.
 default_lvm: false
 
+# Config for sending access details by email.
+# - 'host' - (required) mail server hostname.
+# - 'port' - (optional) mail server port. Defaults to module default.
+# - 'secure' - (optional) whether to use ssl/starttls. Defaults to module default.
+# - 'username' - (required) smtp auth username.
+# - 'password' - (required) smtp auth password.
+# - 'to' - (optional) email recipient address. Default to 'username'.
+# - 'sender' - (optional) email sender address. Default to 'username'.
+# - 'headers' - (optional) list of additional headers. Defaults to empty list.
+mail_report_config: {}
+
 # Enable or disable pxe graphical menu.
 pxe_graphical_menu: false
 

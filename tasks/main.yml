@@ -40,16 +40,35 @@
   tags:
     - image
 
-- name: Print host access details
-  debug:
-    msg: "{{ msg_header.split('\n') + msg_ips }}"
-  vars:
-    msg_header: |-
-      Server '{{ inventory_hostname }}' access details:
-      {{ _pxe_os.desc }}, root, {{ _install_conf.rootpw }}
-    msg_ips: >-
-      {{ _install_conf.net | map(attribute='ip') | map('ipaddr', 'address') | list }}
-  when: inventory_hostname in groups['new'] and not inventory_hostname in groups['dummy']
+- block:
+    - name: Print host access details
+      debug:
+        msg: "{{ msg_header.split('\n') + msg_ips }}"
+      vars:
+        msg_header: |-
+          Server '{{ inventory_hostname }}' access details:
+          {{ _pxe_os.desc }}, root, {{ _install_conf.rootpw }}
+        msg_ips: >-
+          {{ _install_conf.net | map(attribute='ip') | map('ipaddr', 'address') | list }}
 
+    - name: Send email with access details
+      community.general.mail:
+        host: "{{ mail_report_config.host }}"
+        port:   "{{ mail_report_config.port   | default(omit) }}"
+        secure: "{{ mail_report_config.secure | default(omit) }}"
+        username: "{{ mail_report_config.username }}"
+        password: "{{ mail_report_config.password }}"
+        to:     "{{ mail_report_config.to     | default(mail_report_config.username) }}"
+        sender: "{{ mail_report_config.sender | default(mail_report_config.username) }}"
+        subject: "Ansible: Server {{ item_hostname }} access details"
+        body: "{{ lookup('template', './templates/access_details_email.txt') }}"
+        headers: "{{ mail_report_config.headers | default(omit) }}"
+      vars:
+        item_hostname: >-
+          {{ inventory_hostname | regex_replace('_', '-') }}
+      delegate_to: localhost
+
+  when: inventory_hostname in groups['new'] and not inventory_hostname in groups['dummy']
   tags:
+    - access_details
     - always

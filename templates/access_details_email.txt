@@ -1,0 +1,5 @@
+Hello.
+
+Server '{{ item_hostname }}' access details:
+{{ _pxe_os.desc }}, root, {{ _install_conf.rootpw }}
+{{ _install_conf.net | map(attribute='ip') | map('ipaddr', 'address') | join('\n') }}
