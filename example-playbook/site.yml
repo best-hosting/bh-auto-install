@@ -16,4 +16,10 @@
               }
           }
       }}
+    mail_report_config: >-
+      {{
+          { 'host': 'mail.example.com'
+          , 'port': '2525'
+          }
+      }}
 
