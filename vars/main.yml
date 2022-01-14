@@ -25,3 +25,9 @@ addon_pxe_menus_cfg: >-
 
 # Internal pxe_menus dictionary.
 _pxe_menus: {}
+
+# Internal 'mail_report_config'.
+_mail_config: {}
+
+# Mail config data read from 'mail_auth_file' .
+mail_auth: {}

@@ -40,16 +40,34 @@
   tags:
     - image
 
-- name: Print host access details
-  debug:
-    msg: "{{ msg_header.split('\n') + msg_ips }}"
-  vars:
-    msg_header: |-
-      Server '{{ inventory_hostname }}' access details:
-      {{ _pxe_os.desc }}, root, {{ _install_conf.rootpw }}
-    msg_ips: >-
-      {{ _install_conf.net | map(attribute='ip') | map('ipaddr', 'address') | list }}
-  when: inventory_hostname in groups['new'] and not inventory_hostname in groups['dummy']
+- block:
+    - name: Print host access details
+      debug:
+        msg: "{{ msg_header.split('\n') + msg_ips }}"
+      vars:
+        msg_header: |-
+          Server '{{ inventory_hostname }}' access details:
+          {{ _pxe_os.desc }}, root, {{ _install_conf.rootpw }}
+        msg_ips: >-
+          {{ _install_conf.net | map(attribute='ip') | map('ipaddr', 'address') | list }}
 
+    - name: Sending all access details to email
+      community.general.mail:
+        host: "{{ _mail_config.host }}"
+        port:   "{{ _mail_config.port   | default(omit) }}"
+        secure: "{{ _mail_config.secure | default(omit) }}"
+        username: "{{ _mail_config.username }}"
+        password: "{{ _mail_config.password }}"
+        to:     "{{ _mail_config.to }}"
+        sender: "{{ _mail_config.sender }}"
+        subject: "{{ _mail_config.subject }}"
+        body: "{{ _mail_config.body }}"
+        headers: "{{ _mail_config.headers | default(omit) }}"
+      when: _mail_config.host is defined
+      run_once: true
+      delegate_to: localhost
+
+  when: inventory_hostname in groups['new'] and not inventory_hostname in groups['dummy']
   tags:
+    - access_details
     - always

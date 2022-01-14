@@ -1,0 +1,8 @@
+Hello.
+
+{% for host in ansible_play_hosts %}
+Server '{{ host | regex_replace('_', '-') }}' access details:
+{{ hostvars[host]._pxe_os.desc }}, root, {{ hostvars[host]._install_conf.rootpw }}
+{{ hostvars[host]._install_conf.net | map(attribute='ip') | map('ipaddr', 'address') | join('\n') }}
+
+{% endfor %}
