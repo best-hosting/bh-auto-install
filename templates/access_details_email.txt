@@ -1,5 +1,8 @@
 Hello.
 
-Server '{{ item_hostname }}' access details:
-{{ _pxe_os.desc }}, root, {{ _install_conf.rootpw }}
-{{ _install_conf.net | map(attribute='ip') | map('ipaddr', 'address') | join('\n') }}
+{% for host in ansible_play_hosts %}
+Server '{{ host | regex_replace('_', '-') }}' access details:
+{{ hostvars[host]._pxe_os.desc }}, root, {{ hostvars[host]._install_conf.rootpw }}
+{{ hostvars[host]._install_conf.net | map(attribute='ip') | map('ipaddr', 'address') | join('\n') }}
+
+{% endfor %}
