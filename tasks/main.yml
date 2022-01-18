@@ -66,6 +66,8 @@
       when: _mail_config.host is defined
       run_once: true
       delegate_to: localhost
+      tags:
+        - mail
 
   when: inventory_hostname in groups['new'] and not inventory_hostname in groups['dummy']
   tags:
