@@ -12,30 +12,25 @@
         dest: "{{ _pxe_os.checksum_file }}"
         #{{ image_checksum_dir + '/' + item.checksum_url | urlsplit('path') | basename }}
         force: yes
+      register: checksum_file_download
 
+  delegate_to: localhost
+  when: inventory_hostname in groups['servers'] and _pxe_os.checksum_url is defined
+
+- block:
     - name: images (localhost) | Read checksum file
       set_fact:
-        _os_img: >-
-          {{ { 'name'     : cur_name
-             , 'file'     : cur_dest_dir + '/' + cur_name
-             , 'type'     : _pxe_os.iso_type
+        _os_img_checksum: >-
+          {{ { 'name'     : item_name
              , 'hash'     : cur_hash
              , 'hash_type': _pxe_os.checksum_type
-             , 'url'      : _pxe_os.url + '/' + cur_name
-             , 'dest_dir' : cur_dest_dir
-             , 'extract_dir': cur_dest_dir + '/' + cur_name | regex_search('^[^.]+(?=\.)')
-             , 'os_files' : [_pxe_os.iso_kernel, _pxe_os.iso_initrd]
              }
           }}
       vars:
-        cur_dest_dir: >-
-          {{ _pxe_root_path + '/' + _pxe_os.pxe_dir }}
         checksum_data: >-
           {{ lookup('file', _pxe_os.checksum_file) }}
-        cur_name: >-
-          {{ checksum_data
-                | regex_search(_pxe_os.checksum_iso_name_rx, multiline=true)
-          }}
+        item_name: >-
+          {{ checksum_data | regex_search(_pxe_os.checksum_iso_name_rx, multiline=true) }}
         # Hashes are effectively indexed by filenames, thus i need to use
         # (already known from above) filename to find _correct_ row, where to
         # parse hash. Thus, user's 'checksum_rx' should only parse hash from
@@ -52,7 +47,7 @@
         # some guards against false matches.
         #cur_hash: >-
         #  {{ checksum_data
-        #        | regex_findall('^.*\b' + cur_name + '\b.*$', multiline=true)
+        #        | regex_findall('^.*\b' + item_name + '\b.*$', multiline=true)
         #        | map('regex_search', _pxe_os.checksum_rx, multiline=true)
         #        | reject('none')
         #        | list | first
@@ -67,13 +62,48 @@
                 | regex_search('^(?=.*' + _pxe_os.checksum_iso_name_rx + ').*$', multiline=true)
                 | regex_search(_pxe_os.checksum_rx, multiline=true)
           }}
+      when: checksum_file_download.dest is defined
+
+    - name: images | Show OS image checksum information
+      debug:
+        var: _os_img_checksum
+
+    # FIXME: This version of 'splitext' may be too agressive..
+    - name: images (localhost) | Define OS image
+      set_fact:
+        _os_img: >-
+          {{ _os_img_checksum | combine(
+              { 'name'     : item_name
+              , 'file'     : item_dest_dir + '/' + item_name
+              , 'type'     : _pxe_os.iso_type
+              , 'url'      : item_url
+              , 'dest_dir' : item_dest_dir
+              , 'extract_dir': item_dest_dir + '/' + item_name | regex_search('^[^.]+(?=\.)')
+              , 'os_files' : [_pxe_os.iso_kernel]
+                               + ( [_pxe_os.iso_initrd]
+                                     if _pxe_os.iso_initrd is defined
+                                     else []
+                                 )
+              }
+            )
+          }}
+      vars:
+        item_name: >-
+          {{ _os_img_checksum.name | default(_pxe_os.url | basename) }}
+        item_url: >-
+          {{ ( _pxe_os.url + '/' + _os_img_checksum.name )
+                if _os_img_checksum.name is defined
+                else _pxe_os.url
+          }}
+        item_dest_dir: >-
+          {{ _pxe_root_path + '/' + _pxe_os.pxe_dir }}
 
     - name: images | Show OS image definitions
       debug:
         var: _os_img
 
-  when: inventory_hostname in groups['servers']
   delegate_to: localhost
+  when: inventory_hostname in groups['servers']
 
 - block:
     - name: images (pxe_server) | Create image directory
@@ -84,19 +114,28 @@
     - name: image (pxe_server) | Stat image
       stat:
         path: "{{ _os_img.file }}"
-        checksum_algorithm: "{{ _os_img.hash_type }}"
-        get_checksum: true
+        checksum_algorithm: "{{ _os_img.hash_type | default(omit) }}"
+        get_checksum: >-
+          {{ true if _os_img.hash_type is defined else false }}
       register: iso_file_stats
 
     - name: images (pxe_server) | Download image
       get_url:
         url:  "{{ _os_img.url }}"
         dest: "{{ _os_img.file }}"
-        checksum: "{{ _os_img.hash_type + ':' + _os_img.hash }}"
+        checksum: >-
+          {{ _os_img.hash_type + ':' + _os_img.hash
+              if _os_img.hash_type is defined
+              else omit
+          }}
         force: true
+      # FIXME: Defining 'hash_type' and 'hash'
       when: force_overwrite
             or not iso_file_stats.stat.exists
-            or iso_file_stats.stat.checksum != _os_img.hash
+            or ( iso_file_stats.stat.checksum != _os_img.hash
+                   if _os_img.hash_type is defined
+                   else false
+               )
       register: iso_file_download
 
     - block:

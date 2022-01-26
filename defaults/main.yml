@@ -88,6 +88,19 @@ default_net: {}
 # Start index for use in pxe OS config names.
 pxe_os_cfg_index_offset: 30
 
+# - 'url' - url for downloading iso file. If 'checksum_iso_name_rx' is
+# defined, url should be to _directory_. Iso filename looked up using
+# 'checksum_iso_name_rx' in checksum file will be appended to 'url'. If
+# 'checksum_iso_name_rx' is _not_ defined, 'url' should directly lead to iso
+# file.
+# to _directory_, where to download iso from. Full url to iso
+# file will be constructed later (see below).
+# - 'checksum_iso_name_rx' - regexp, that should match to iso filename in
+# checksum file.  This filename will be used to construct url to download iso
+# file.
+# - 'iso_filename_rx' - regexp, that should match with filename of _any_ iso
+# version saved on disk. It's used to find all downloaded iso versions and
+# delete old ones.
 pxe_os:
   { 'centos6' :
       { 'desc': 'CentOS 6'
@@ -241,12 +254,23 @@ pxe_os:
       , 'pxe_menu': 'debian'
       , 'sort_index':  11
       }
+  , 'memtest86plus5.31b' :
+      { 'desc': 'Memtest86+ 5.31b'
+      , 'url' : 'https://www.memtest.org/download/5.31b/memtest86+-5.31b.bin.zip'
+      , 'iso_filename_rx': 'memtest86+-[0-9.a-z]+\.bin\.zip'
+      , 'iso_kernel': 'memtest86+-5.31b.bin'
+      , 'iso_kernel_type': 'linux'
+      , 'iso_type': 'archive'
+      , 'pxe_menu': 'memtest'
+      , 'sort_index':  1
+      }
   }
 
 # Friendly names for pxe menus referenced from 'pxe_os'.
 pxe_menus:
   { 'debian'  : { 'desc' : 'Debian' }
   , 'centos'  : { 'desc' : 'CentOS' }
+  , 'memtest' : { 'desc' : 'Memtest86+' }
   }
 
 # 'pxe_root_path': root path served by tftp server (i.e. accessible for
