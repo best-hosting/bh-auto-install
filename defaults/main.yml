@@ -98,6 +98,8 @@ pxe_os_cfg_index_offset: 30
 # - 'checksum_iso_name_rx' - regexp, that should match to iso filename in
 # checksum file.  This filename will be used to construct url to download iso
 # file.
+# - 'checksum_rx' - regexp to match hash from corresponding row in checksum
+# file.
 # - 'iso_filename_rx' - regexp, that should match with filename of _any_ iso
 # version saved on disk. It's used to find all downloaded iso versions and
 # delete old ones.
