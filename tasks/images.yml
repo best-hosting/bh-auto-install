@@ -68,7 +68,6 @@
       debug:
         var: _os_img_checksum
 
-    # FIXME: This version of 'splitext' may be too agressive..
     - name: images (localhost) | Define OS image
       set_fact:
         _os_img: >-
@@ -78,7 +77,9 @@
               , 'type'     : _pxe_os.iso_type
               , 'url'      : item_url
               , 'dest_dir' : item_dest_dir
-              , 'extract_dir': item_dest_dir + '/' + item_name | regex_search('^[^.]+(?=\.)')
+              , 'extract_dir': item_dest_dir + '/'
+                                  + item_name | regex_search('^(.(?!\.tar\.gz$|\.[^.]+$))+.')
+                                  + '-unarchive'
               , 'os_files' : [_pxe_os.iso_kernel]
                                + ( [_pxe_os.iso_initrd]
                                      if _pxe_os.iso_initrd is defined
