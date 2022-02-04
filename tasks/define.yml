@@ -167,38 +167,67 @@
     - name: define | Define pxe OS config
       set_fact:
         _pxe_os: >-
-          {{ item_os | combine(
-                { 'name' : item_name
-                , 'checksum_url'  : item_checksum_url
-                , 'checksum_dir'  : item_checksum_dir
-                , 'checksum_file' : item_checksum_dir + '/' + item_os.checksum_fn
-                , 'pxe_dir'       : item_pxe_dir
-                , 'pxe_kernel'    : item_pxe_dir + '/' + item_os.iso_kernel | basename
-                , 'pxe_initrd'    : item_pxe_dir + '/' + item_os.iso_initrd | basename
-                , 'pxe_menu_cfg'  : hostvars[_pxe_server]._pxelinux_incl_dir
-                                      + '/' + item_os.pxe_menu + '.cfg'
-                , 'pxe_menu_cfg_d' : item_pxe_menu_cfg_d
-                , 'pxe_cfg'       : item_pxe_menu_cfg_d
-                                      + '/' + item_pxe_cfg_index + '_' + item_name + '.cfg'
-                , 'gen_pxe_os'  : item_os.gen_pxe_os | default(true)
-                }
-              )
+          {{
+              { 'name' : item_name
+              , 'desc' : item_os.desc | default(omit)
+              , 'url'  : item_os.url
+
+              , 'iso_kernel'    : item_os.iso_kernel
+              , 'iso_initrd'    : item_iso_initrd
+              , 'iso_type'      : item_os.iso_type
+              , 'iso_filename_rx' : item_os.iso_filename_rx
+
+              , 'pxe_dir'       : item_pxe_dir
+              , 'pxe_kernel'    : item_pxe_dir + '/' + item_os.iso_kernel | basename
+              , 'pxe_kernel_type' : item_os.iso_kernel_type | default('')
+              , 'pxe_initrd'    : item_pxe_dir + '/' + item_iso_initrd | basename
+                                    if item_iso_initrd != ''
+                                    else ''
+              , 'pxe_append'    : item_os.pxe_append | default(omit)
+              , 'ks_pxe_append' : item_os.ks_pxe_append | default(omit)
+              , 'pxe_menu_cfg'  : hostvars[_pxe_server]._pxelinux_incl_dir
+                                    + '/' + item_os.pxe_menu + '.cfg'
+              , 'pxe_menu_cfg_d' : item_pxe_menu_cfg_d
+              , 'pxe_cfg'       : item_pxe_menu_cfg_d
+                                    + '/' + item_pxe_cfg_index + '_' + item_name + '.cfg'
+              , 'gen_pxe_os'  : item_os.gen_pxe_os | default(true)
+              }
           }}
       vars:
         item_name: >-
           {{ _install_conf['os'] }}
         item_os: >-
           {{ pxe_os[item_name] }}
-        item_checksum_url: >-
-          {{ item_os.checksum_url | default(item_os.url) + '/' + item_os.checksum_fn }}
-        item_checksum_dir: >-
-          {{ images_checksum_dir + '/' + item_name }}
+        item_iso_initrd: >-
+          {{ item_os.iso_initrd | default('') }}
         item_pxe_dir: >-
           {{ item_name }}
         item_pxe_menu_cfg_d: >-
           {{ hostvars[_pxe_server]._pxe_cfg_d_path + '/' + item_os.pxe_menu }}
         item_pxe_cfg_index: >-
           {{ pxe_os_cfg_index_offset + item_os.sort_index }}
+
+    - name: define | Define pxe OS checksum config
+      set_fact:
+        _pxe_os: >-
+          {{ _pxe_os | combine(
+                { 'checksum_url'  : item_checksum_url
+                , 'checksum_rx'   : item_os.checksum_rx
+                , 'checksum_iso_name_rx' : item_os.checksum_iso_name_rx
+                , 'checksum_type' : item_os.checksum_type
+                , 'checksum_dir'  : item_checksum_dir
+                , 'checksum_file' : item_checksum_dir + '/' + item_os.checksum_fn
+                }
+              )
+          }}
+      vars:
+        item_os: >-
+          {{ pxe_os[_pxe_os.name] }}
+        item_checksum_url: >-
+          {{ item_os.checksum_url | default(item_os.url) + '/' + item_os.checksum_fn }}
+        item_checksum_dir: >-
+          {{ images_checksum_dir + '/' + _pxe_os.name }}
+      when: pxe_os[_pxe_os.name].checksum_fn is defined
 
     - name: define | Show pxe OS config
       debug:
@@ -264,5 +293,5 @@
       debug:
         var: _mail_config
 
-  when: mail_report_config.host is defined
+  when: inventory_hostname not in groups['dummy'] and mail_report_config.host is defined
 

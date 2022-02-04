@@ -8,6 +8,7 @@ images_checksum_dir: "{{ playbook_dir + '/image_checksums' }}"
 
 _pxe_os: {}
 _os_img: {}
+_os_img_checksum: {}
 
 file_does_not_exist: "{{ '/' + 65534 | random(seed=_install_conf.name) | hash('sha1') }}"
 
