@@ -140,7 +140,7 @@ pxe_os:
 
   , 'centos8' :
       { 'desc': 'CentOS 8'
-      , 'url' : 'https://mirror.yandex.ru/centos/8/isos/x86_64'
+      , 'url' : 'https://vault.centos.org/8.5.2111/isos/x86_64/'
       , 'checksum_fn': 'CHECKSUM'
       , 'checksum_rx': '(?<= = )[0-9a-f]+$'
       , 'checksum_iso_name_rx': '(?<=SHA256 \()CentOS-8\.[0-9]+\.[0-9]+-x86_64-boot\.iso(?=\) = )'
