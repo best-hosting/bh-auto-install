@@ -107,6 +107,12 @@
   when: inventory_hostname in groups['servers']
 
 - block:
+    - name: images (pxe_server) | Install packages for working with images
+      package:
+        name:
+          - 'unzip'
+        state: present
+
     - name: images (pxe_server) | Create image directory
       file:
         name: "{{ _os_img.dest_dir }}"
