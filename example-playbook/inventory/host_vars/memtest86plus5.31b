@@ -1,0 +1,6 @@
+---
+
+install_conf:
+  os: 'memtest86plus5.31b'
+  gen_ks: false
+  gen_pxe_host: false

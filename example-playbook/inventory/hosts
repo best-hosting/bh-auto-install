@@ -11,6 +11,12 @@ new:
 #    test2:
 
 dummy:
+  children:
+    debian:
+    centos:
+    memtest:
+
+debian:
   hosts:
     debian6:
     debian7:
@@ -18,8 +24,17 @@ dummy:
     debian9:
     debian10:
     debian11:
+
+centos:
+  hosts:
     centos6:
     centos7:
+
+memtest:
+  hosts:
+    memtest86plus5.31b:
+    memtest86plus4.20:
+    memtest86plus2.11:
 
 pxe_servers:
   hosts:
