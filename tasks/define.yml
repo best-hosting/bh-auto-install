@@ -293,5 +293,7 @@
       debug:
         var: _mail_config
 
-  when: inventory_hostname not in groups['dummy'] and mail_report_config.host is defined
+  when:     inventory_hostname     in groups['servers']
+        and inventory_hostname not in groups['dummy']
+        and mail_report_config.host is defined
 
