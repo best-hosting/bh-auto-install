@@ -114,7 +114,7 @@ pxe_os:
       , 'iso_filename_rx': 'CentOS-6\.[0-9]+-x86_64-netinstall\.iso'
       , 'iso_kernel': 'images/pxeboot/vmlinuz'
       , 'iso_initrd': 'images/pxeboot/initrd.img'
-      , 'pxe_append': 'ip=dhcp repo=https://vault.centos.org/6.10/isos/x86_64 lang=en_US keymap=us'
+      , 'pxe_append': 'ip=dhcp repo=https://vault.centos.org/6.10/os/x86_64/ lang=en_US keymap=us'
       , 'ks_pxe_append': 'ip=dhcp'
       , 'iso_type': 'iso'
       , 'pxe_menu': 'centos'
