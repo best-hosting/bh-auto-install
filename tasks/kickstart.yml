@@ -1,7 +1,7 @@
 ---
 
 - block:
-    - name: kickstart (kickstart server) | Install
+    - name: kickstart (kickstart server) | Install nginx
       package:
         name: 'nginx'
         state: present

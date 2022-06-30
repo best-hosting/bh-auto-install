@@ -9,7 +9,8 @@
           {{ hostvars[_pxe_server].pxe_cfg_d_path | default(item_pxe_root_path + '/pxelinux_menus.d') }}
         _tftp_address: >-
           {{ hostvars[_pxe_server].tftp_address
-                | default(hostvars[_pxe_server].ansible_default_ipv4.address + ':69')
+                | default(hostvars[_pxe_server].ansible_default_ipv4.address)
+                | ipaddr('address')
           }}
         _pxelinux_cfg: >-
           {{ item_pxelinux_cfg }}

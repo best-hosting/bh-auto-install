@@ -34,7 +34,7 @@
         path: '/etc/default/tftpd-hpa'
         backup: yes
         regexp: '^TFTP_ADDRESS='
-        line: "{{ 'TFTP_ADDRESS=\"' + hostvars[_pxe_server]._tftp_address + '\"' }}"
+        line: "{{ 'TFTP_ADDRESS=\"' + hostvars[_pxe_server]._tftp_address + ':69\"' }}"
       notify:
         - restart tftpd
 
