@@ -15,6 +15,7 @@ dummy:
     debian:
     centos:
     memtest:
+    ubuntu:
 
 debian:
   hosts:
@@ -35,6 +36,10 @@ memtest:
     memtest86plus5.31b:
     memtest86plus4.20:
     memtest86plus2.11:
+
+ubuntu:
+  hosts:
+    ubuntu2204:
 
 pxe_servers:
   hosts:

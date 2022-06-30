@@ -103,196 +103,221 @@ pxe_os_cfg_index_offset: 30
 # - 'iso_filename_rx' - regexp, that should match with filename of _any_ iso
 # version saved on disk. It's used to find all downloaded iso versions and
 # delete old ones.
-pxe_os:
-  { 'centos6' :
-      { 'desc': 'CentOS 6'
-      , 'url' : 'https://vault.centos.org/6.10/isos/x86_64'
-      , 'checksum_fn': 'sha256sum.txt.asc'
-      , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
-      , 'checksum_iso_name_rx': '(?<=  )CentOS-6\.[0-9]+-x86_64-netinstall\.iso$'
-      , 'checksum_type': 'sha256'
-      , 'iso_filename_rx': 'CentOS-6\.[0-9]+-x86_64-netinstall\.iso'
-      , 'iso_kernel': 'images/pxeboot/vmlinuz'
-      , 'iso_initrd': 'images/pxeboot/initrd.img'
-      , 'pxe_append': 'ip=dhcp repo=https://vault.centos.org/6.10/isos/x86_64 lang=en_US keymap=us'
-      , 'ks_pxe_append': 'ip=dhcp'
-      , 'iso_type': 'iso'
-      , 'pxe_menu': 'centos'
-      , 'sort_index':  6
-      }
+pxe_os: >-
+  {{
+    { 'centos6' :
+        { 'desc': 'CentOS 6'
+        , 'url' : 'https://vault.centos.org/6.10/isos/x86_64'
+        , 'checksum_fn': 'sha256sum.txt.asc'
+        , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
+        , 'checksum_iso_name_rx': '(?<=  )CentOS-6\.[0-9]+-x86_64-netinstall\.iso$'
+        , 'checksum_type': 'sha256'
+        , 'iso_filename_rx': 'CentOS-6\.[0-9]+-x86_64-netinstall\.iso'
+        , 'iso_kernel': 'images/pxeboot/vmlinuz'
+        , 'iso_initrd': 'images/pxeboot/initrd.img'
+        , 'pxe_append': 'ip=dhcp repo=https://vault.centos.org/6.10/isos/x86_64 lang=en_US keymap=us'
+        , 'ks_pxe_append': 'ip=dhcp'
+        , 'iso_type': 'iso'
+        , 'pxe_menu': 'centos'
+        , 'sort_index':  6
+        }
 
-  , 'centos7' :
-      { 'desc': 'CentOS 7'
-      , 'url' : 'https://mirror.yandex.ru/centos/7/isos/x86_64'
-      , 'checksum_fn' : 'sha256sum.txt.asc'
-      , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
-      , 'checksum_iso_name_rx': '(?<=  )CentOS-7-x86_64-NetInstall-[0-9]+\.iso$'
-      , 'checksum_type': 'sha256'
-      , 'iso_filename_rx': 'CentOS-7-x86_64-NetInstall-[0-9]+\.iso'
-      , 'iso_kernel': 'images/pxeboot/vmlinuz'
-      , 'iso_initrd': 'images/pxeboot/initrd.img'
-      , 'pxe_append': 'ip=dhcp inst.repo=http://mirror.yandex.ru/centos/7/os/x86_64 inst.lang=en_US inst.keymap=us'
-      , 'ks_pxe_append': 'ip=dhcp'
-      , 'iso_type': 'iso'
-      , 'pxe_menu': 'centos'
-      , 'sort_index':  7
-      }
+    , 'centos7' :
+        { 'desc': 'CentOS 7'
+        , 'url' : 'https://mirror.yandex.ru/centos/7/isos/x86_64'
+        , 'checksum_fn' : 'sha256sum.txt.asc'
+        , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
+        , 'checksum_iso_name_rx': '(?<=  )CentOS-7-x86_64-NetInstall-[0-9]+\.iso$'
+        , 'checksum_type': 'sha256'
+        , 'iso_filename_rx': 'CentOS-7-x86_64-NetInstall-[0-9]+\.iso'
+        , 'iso_kernel': 'images/pxeboot/vmlinuz'
+        , 'iso_initrd': 'images/pxeboot/initrd.img'
+        , 'pxe_append': 'ip=dhcp inst.repo=http://mirror.yandex.ru/centos/7/os/x86_64 inst.lang=en_US inst.keymap=us'
+        , 'ks_pxe_append': 'ip=dhcp'
+        , 'iso_type': 'iso'
+        , 'pxe_menu': 'centos'
+        , 'sort_index':  7
+        }
 
-  , 'centos8' :
-      { 'desc': 'CentOS 8'
-      , 'url' : 'https://vault.centos.org/8.5.2111/isos/x86_64/'
-      , 'checksum_fn': 'CHECKSUM'
-      , 'checksum_rx': '(?<= = )[0-9a-f]+$'
-      , 'checksum_iso_name_rx': '(?<=SHA256 \()CentOS-8\.[0-9]+\.[0-9]+-x86_64-boot\.iso(?=\) = )'
-      , 'checksum_type': 'sha256'
-      , 'iso_filename_rx' : 'CentOS-8\.[0-9]+\.[0-9]+-x86_64-boot\.iso'
-      , 'iso_kernel': 'images/pxeboot/vmlinuz'
-      , 'iso_initrd': 'images/pxeboot/initrd.img'
-      , 'pxe_append': 'ip=dhcp inst.repo=https://mirror.yandex.ru/centos/8/BaseOS/x86_64/os inst.lang=en_US inst.keymap=us'
-      , 'ks_pxe_append': 'ip=dhcp'
-      , 'iso_type': 'iso'
-      , 'pxe_menu': 'centos'
-      , 'sort_index':  8
-      }
+    , 'centos8' :
+        { 'desc': 'CentOS 8'
+        , 'url' : 'https://vault.centos.org/8.5.2111/isos/x86_64/'
+        , 'checksum_fn': 'CHECKSUM'
+        , 'checksum_rx': '(?<= = )[0-9a-f]+$'
+        , 'checksum_iso_name_rx': '(?<=SHA256 \()CentOS-8\.[0-9]+\.[0-9]+-x86_64-boot\.iso(?=\) = )'
+        , 'checksum_type': 'sha256'
+        , 'iso_filename_rx' : 'CentOS-8\.[0-9]+\.[0-9]+-x86_64-boot\.iso'
+        , 'iso_kernel': 'images/pxeboot/vmlinuz'
+        , 'iso_initrd': 'images/pxeboot/initrd.img'
+        , 'pxe_append': 'ip=dhcp inst.repo=https://mirror.yandex.ru/centos/8/BaseOS/x86_64/os inst.lang=en_US inst.keymap=us'
+        , 'ks_pxe_append': 'ip=dhcp'
+        , 'iso_type': 'iso'
+        , 'pxe_menu': 'centos'
+        , 'sort_index':  8
+        }
 
-  , 'debian6' :
-      { 'desc': 'Debian 6 (squeeze)'
-      , 'url' : 'http://archive.debian.org/debian/dists/squeeze/main/installer-amd64/current/images/netboot'
-      , 'checksum_url' : 'http://archive.debian.org/debian/dists/squeeze/main/installer-amd64/current/images'
-      , 'checksum_fn': 'MD5SUMS'
-      , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
-      , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
-      , 'checksum_type': 'md5'
-      , 'iso_filename_rx': 'netboot\.tar\.gz'
-      , 'iso_kernel': 'debian-installer/amd64/linux'
-      , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
-      , 'pxe_append': 'vga=788 --- quiet'
-      , 'iso_type': 'archive'
-      , 'pxe_menu': 'debian'
-      , 'sort_index':  6
-      }
+    , 'debian6' :
+        { 'desc': 'Debian 6 (squeeze)'
+        , 'url' : 'http://archive.debian.org/debian/dists/squeeze/main/installer-amd64/current/images/netboot'
+        , 'checksum_url' : 'http://archive.debian.org/debian/dists/squeeze/main/installer-amd64/current/images'
+        , 'checksum_fn': 'MD5SUMS'
+        , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
+        , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
+        , 'checksum_type': 'md5'
+        , 'iso_filename_rx': 'netboot\.tar\.gz'
+        , 'iso_kernel': 'debian-installer/amd64/linux'
+        , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+        , 'pxe_append': 'vga=788 --- quiet'
+        , 'iso_type': 'archive'
+        , 'pxe_menu': 'debian'
+        , 'sort_index':  6
+        }
 
-  , 'debian7' :
-      { 'desc': 'Debian 7 (wheezy)'
-      , 'url' : 'http://archive.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot'
-      , 'checksum_url' : 'http://archive.debian.org/debian/dists/wheezy/main/installer-amd64/current/images'
-      , 'checksum_fn': 'SHA256SUMS'
-      , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
-      , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
-      , 'checksum_type': 'sha256'
-      , 'iso_filename_rx': 'netboot\.tar\.gz'
-      , 'iso_kernel': 'debian-installer/amd64/linux'
-      , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
-      , 'pxe_append': 'vga=788 --- quiet'
-      , 'iso_type': 'archive'
-      , 'pxe_menu': 'debian'
-      , 'sort_index':  7
-      }
+    , 'debian7' :
+        { 'desc': 'Debian 7 (wheezy)'
+        , 'url' : 'http://archive.debian.org/debian/dists/wheezy/main/installer-amd64/current/images/netboot'
+        , 'checksum_url' : 'http://archive.debian.org/debian/dists/wheezy/main/installer-amd64/current/images'
+        , 'checksum_fn': 'SHA256SUMS'
+        , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
+        , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
+        , 'checksum_type': 'sha256'
+        , 'iso_filename_rx': 'netboot\.tar\.gz'
+        , 'iso_kernel': 'debian-installer/amd64/linux'
+        , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+        , 'pxe_append': 'vga=788 --- quiet'
+        , 'iso_type': 'archive'
+        , 'pxe_menu': 'debian'
+        , 'sort_index':  7
+        }
 
-  , 'debian8' :
-      { 'desc': 'Debian 8 (jessie)'
-      , 'url' : 'http://ftp.debian.org/debian/dists/jessie/main/installer-amd64/current/images/netboot'
-      , 'checksum_url' : 'http://ftp.debian.org/debian/dists/jessie/main/installer-amd64/current/images'
-      , 'checksum_fn': 'SHA256SUMS'
-      , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
-      , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
-      , 'checksum_type': 'sha256'
-      , 'iso_filename_rx': 'netboot\.tar\.gz'
-      , 'iso_kernel': 'debian-installer/amd64/linux'
-      , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
-      , 'pxe_append': 'vga=788 --- quiet'
-      , 'iso_type': 'archive'
-      , 'pxe_menu': 'debian'
-      , 'sort_index':  8
-      }
+    , 'debian8' :
+        { 'desc': 'Debian 8 (jessie)'
+        , 'url' : 'http://ftp.debian.org/debian/dists/jessie/main/installer-amd64/current/images/netboot'
+        , 'checksum_url' : 'http://ftp.debian.org/debian/dists/jessie/main/installer-amd64/current/images'
+        , 'checksum_fn': 'SHA256SUMS'
+        , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
+        , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
+        , 'checksum_type': 'sha256'
+        , 'iso_filename_rx': 'netboot\.tar\.gz'
+        , 'iso_kernel': 'debian-installer/amd64/linux'
+        , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+        , 'pxe_append': 'vga=788 --- quiet'
+        , 'iso_type': 'archive'
+        , 'pxe_menu': 'debian'
+        , 'sort_index':  8
+        }
 
-  , 'debian9' :
-      { 'desc': 'Debian 9 (stretch)'
-      , 'url' : 'http://ftp.debian.org/debian/dists/stretch/main/installer-amd64/current/images/netboot'
-      , 'checksum_url' : 'http://ftp.debian.org/debian/dists/stretch/main/installer-amd64/current/images'
-      , 'checksum_fn': 'SHA256SUMS'
-      , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
-      , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
-      , 'checksum_type': 'sha256'
-      , 'iso_filename_rx': 'netboot\.tar\.gz'
-      , 'iso_kernel': 'debian-installer/amd64/linux'
-      , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
-      , 'pxe_append': 'vga=788 --- quiet'
-      , 'iso_type': 'archive'
-      , 'pxe_menu': 'debian'
-      , 'sort_index':  9
-      }
+    , 'debian9' :
+        { 'desc': 'Debian 9 (stretch)'
+        , 'url' : 'http://ftp.debian.org/debian/dists/stretch/main/installer-amd64/current/images/netboot'
+        , 'checksum_url' : 'http://ftp.debian.org/debian/dists/stretch/main/installer-amd64/current/images'
+        , 'checksum_fn': 'SHA256SUMS'
+        , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
+        , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
+        , 'checksum_type': 'sha256'
+        , 'iso_filename_rx': 'netboot\.tar\.gz'
+        , 'iso_kernel': 'debian-installer/amd64/linux'
+        , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+        , 'pxe_append': 'vga=788 --- quiet'
+        , 'iso_type': 'archive'
+        , 'pxe_menu': 'debian'
+        , 'sort_index':  9
+        }
 
-  , 'debian10' :
-      { 'desc': 'Debian 10 (buster)'
-      , 'url' : 'http://ftp.debian.org/debian/dists/buster/main/installer-amd64/current/images/netboot'
-      , 'checksum_url' : 'http://ftp.debian.org/debian/dists/buster/main/installer-amd64/current/images'
-      , 'checksum_fn': 'SHA256SUMS'
-      , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
-      , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
-      , 'checksum_type': 'sha256'
-      , 'iso_filename_rx': 'netboot\.tar\.gz'
-      , 'iso_kernel': 'debian-installer/amd64/linux'
-      , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
-      , 'pxe_append': 'vga=788 --- quiet'
-      , 'iso_type': 'archive'
-      , 'pxe_menu': 'debian'
-      , 'sort_index':  10
-      }
+    , 'debian10' :
+        { 'desc': 'Debian 10 (buster)'
+        , 'url' : 'http://ftp.debian.org/debian/dists/buster/main/installer-amd64/current/images/netboot'
+        , 'checksum_url' : 'http://ftp.debian.org/debian/dists/buster/main/installer-amd64/current/images'
+        , 'checksum_fn': 'SHA256SUMS'
+        , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
+        , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
+        , 'checksum_type': 'sha256'
+        , 'iso_filename_rx': 'netboot\.tar\.gz'
+        , 'iso_kernel': 'debian-installer/amd64/linux'
+        , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+        , 'pxe_append': 'vga=788 --- quiet'
+        , 'iso_type': 'archive'
+        , 'pxe_menu': 'debian'
+        , 'sort_index':  10
+        }
 
-  , 'debian11' :
-      { 'desc': 'Debian 11 (bullseye)'
-      , 'url' : 'http://ftp.debian.org/debian/dists/bullseye/main/installer-amd64/current/images/netboot'
-      , 'checksum_url' : 'http://ftp.debian.org/debian/dists/bullseye/main/installer-amd64/current/images'
-      , 'checksum_fn': 'SHA256SUMS'
-      , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
-      , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
-      , 'checksum_type': 'sha256'
-      , 'iso_filename_rx': 'netboot\.tar\.gz'
-      , 'iso_kernel': 'debian-installer/amd64/linux'
-      , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
-      , 'pxe_append': 'vga=788 --- quiet'
-      , 'iso_type': 'archive'
-      , 'pxe_menu': 'debian'
-      , 'sort_index':  11
-      }
-  , 'memtest86plus5.31b' :
-      { 'desc': 'Memtest86+ 5.31b'
-      , 'url' : 'https://www.memtest.org/download/5.31b/memtest86+-5.31b.bin.zip'
-      , 'iso_filename_rx': 'memtest86+-[0-9.a-z]+\.bin\.zip'
-      , 'iso_kernel': 'memtest86+-5.31b.bin'
-      , 'iso_kernel_type': 'linux'
-      , 'iso_type': 'archive'
-      , 'pxe_menu': 'memtest'
-      , 'sort_index':  1
-      }
-  , 'memtest86plus4.20' :
-      { 'desc': 'Memtest86+ 4.20'
-      , 'url' : 'https://www.memtest.org/download/4.20/memtest86+-4.20.zip'
-      , 'iso_filename_rx': 'memtest86+-[0-9.a-z]+\.zip'
-      , 'iso_kernel': 'memtest.bin'
-      , 'iso_kernel_type': 'linux'
-      , 'iso_type': 'archive'
-      , 'pxe_menu': 'memtest'
-      , 'sort_index':  2
-      }
-  , 'memtest86plus2.11' :
-      { 'desc': 'Memtest86+ 2.11'
-      , 'url' : 'https://www.memtest.org/download/2.11/memtest86+-2.11.zip'
-      , 'iso_filename_rx': 'memtest86+-[0-9.a-z]+\.zip'
-      , 'iso_kernel': 'memtest86+-2.10.bin'
-      , 'iso_kernel_type': 'linux'
-      , 'iso_type': 'archive'
-      , 'pxe_menu': 'memtest'
-      , 'sort_index':  3
-      }
-  }
+    , 'debian11' :
+        { 'desc': 'Debian 11 (bullseye)'
+        , 'url' : 'http://ftp.debian.org/debian/dists/bullseye/main/installer-amd64/current/images/netboot'
+        , 'checksum_url' : 'http://ftp.debian.org/debian/dists/bullseye/main/installer-amd64/current/images'
+        , 'checksum_fn': 'SHA256SUMS'
+        , 'checksum_rx'         : '^[0-9a-f]+(?=  )'
+        , 'checksum_iso_name_rx': '(?<=  \./netboot/)netboot\.tar\.gz$'
+        , 'checksum_type': 'sha256'
+        , 'iso_filename_rx': 'netboot\.tar\.gz'
+        , 'iso_kernel': 'debian-installer/amd64/linux'
+        , 'iso_initrd': 'debian-installer/amd64/initrd.gz'
+        , 'pxe_append': 'vga=788 --- quiet'
+        , 'iso_type': 'archive'
+        , 'pxe_menu': 'debian'
+        , 'sort_index':  11
+        }
 
+    , 'memtest86plus5.31b' :
+        { 'desc': 'Memtest86+ 5.31b'
+        , 'url' : 'https://www.memtest.org/download/5.31b/memtest86+-5.31b.bin.zip'
+        , 'iso_filename_rx': 'memtest86+-[0-9.a-z]+\.bin\.zip'
+        , 'iso_kernel': 'memtest86+-5.31b.bin'
+        , 'iso_kernel_type': 'linux'
+        , 'iso_type': 'archive'
+        , 'pxe_menu': 'memtest'
+        , 'sort_index':  1
+        }
+
+    , 'memtest86plus4.20' :
+        { 'desc': 'Memtest86+ 4.20'
+        , 'url' : 'https://www.memtest.org/download/4.20/memtest86+-4.20.zip'
+        , 'iso_filename_rx': 'memtest86+-[0-9.a-z]+\.zip'
+        , 'iso_kernel': 'memtest.bin'
+        , 'iso_kernel_type': 'linux'
+        , 'iso_type': 'archive'
+        , 'pxe_menu': 'memtest'
+        , 'sort_index':  2
+        }
+
+    , 'memtest86plus2.11' :
+        { 'desc': 'Memtest86+ 2.11'
+        , 'url' : 'https://www.memtest.org/download/2.11/memtest86+-2.11.zip'
+        , 'iso_filename_rx': 'memtest86+-[0-9.a-z]+\.zip'
+        , 'iso_kernel': 'memtest86+-2.10.bin'
+        , 'iso_kernel_type': 'linux'
+        , 'iso_type': 'archive'
+        , 'pxe_menu': 'memtest'
+        , 'sort_index':  3
+        }
+
+    , 'ubuntu2204' :
+        { 'desc': 'Ubuntu 22.04 LTS (Jammy Jellyfish)'
+        , 'url' : 'https://releases.ubuntu.com/jammy'
+        , 'checksum_url' : 'https://releases.ubuntu.com/jammy'
+        , 'checksum_fn': 'SHA256SUMS'
+        , 'checksum_rx'         : '^[0-9a-f]+(?= \*)'
+        , 'checksum_iso_name_rx': '(?<= \*)ubuntu-22\.04-live-server-amd64\.iso$'
+        , 'checksum_type': 'sha256'
+        , 'iso_filename_rx': 'ubuntu-22\.04-live-server-amd64\.iso'
+        , 'iso_kernel': 'casper/vmlinuz'
+        , 'iso_initrd': 'casper/initrd'
+        , 'pxe_append': 'root=/dev/ram0 ramdisk_size=1500000 ip=dhcp url='
+                          + 'http://'
+                          + hostvars[pxe_server].tftp_address
+                          + '/tftp/ubuntu2204/ubuntu-22.04-live-server-amd64.iso'
+        , 'iso_type': 'iso'
+        , 'pxe_menu': 'ubuntu'
+        , 'sort_index':  22
+        }
+    }
+  }}
 # Friendly names for pxe menus referenced from 'pxe_os'.
 pxe_menus:
   { 'debian'  : { 'desc' : 'Debian' }
   , 'centos'  : { 'desc' : 'CentOS' }
   , 'memtest' : { 'desc' : 'Memtest86+' }
+  , 'ubuntu'  : { 'desc' : 'Ubuntu' }
   }
 
 # 'pxe_root_path': root path served by tftp server (i.e. accessible for

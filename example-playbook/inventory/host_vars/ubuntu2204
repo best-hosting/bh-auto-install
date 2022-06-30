@@ -1,0 +1,7 @@
+---
+
+install_conf:
+  os: 'ubuntu2204'
+  gen_ks: false
+  gen_pxe_host: false
+
