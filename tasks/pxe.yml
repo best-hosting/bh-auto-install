@@ -29,12 +29,14 @@
       notify:
         - restart tftpd
 
+    # FIXME: Merge tftp addresses properly.
     - name: pxe (pxe_server) | Set tftp server listen address
       lineinfile:
         path: '/etc/default/tftpd-hpa'
         backup: yes
         regexp: '^TFTP_ADDRESS='
-        line: "{{ 'TFTP_ADDRESS=\"' + hostvars[_pxe_server]._tftp_address + '\"' }}"
+        #line: "{{ 'TFTP_ADDRESS=\"' + hostvars[_pxe_server]._tftp_address + '\"' }}"
+        line: "{{ 'TFTP_ADDRESS=\"' + '0.0.0.0' + '\"' }}"
       notify:
         - restart tftpd
 

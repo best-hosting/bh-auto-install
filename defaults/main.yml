@@ -73,6 +73,8 @@ addon_pxe_menus_file: "{{ playbook_dir + '/addon_pxe_menus.cfg' }}"
 # 'default_net'.
 default_net: {}
 
+net_conf: {}
+
 # install_conf:
 # - 'name'
 # - 'raid'
@@ -295,16 +297,18 @@ pxe_menus:
   , 'memtest' : { 'desc' : 'Memtest86+' }
   }
 
-# 'pxe_root_path': root path served by tftp server (i.e. accessible for
+# PXE server config variables:
+# 'pxe_root_path' - root path served by tftp server (i.e. accessible for
 # pxelinux).
-# 'tftp_address': address _with port_, on which tftpd server should listen.
-# 'pxelinux_cfg' : main pxe config, which 'pxelinux' reads first. Path
-# _relative_ to 'pxe_root_path'.
-# 'pxelinux_incl_dir': directory, where to place assembled pxe menu configs.
-# Path _relative_ to 'pxe_root_path'.
-# 'pxe_cfg_d_path' : Path, where to store hosts and os pxe configs generated
+# 'pxe_cfg_d_path' - Path, where to store hosts and os pxe configs generated
 # from ansible template. They'll be later assembled into 'hosts' and os pxe
 # menus and placed (when assembled) in 'pxelinux_incl_dir'.
+# 'pxelinux_cfg' - main pxe config, which 'pxelinux' reads first. Path
+# _relative_ to 'pxe_root_path'.
+#
+# 'tftp_address': address _with port_, on which tftpd server should listen.
+# 'pxelinux_incl_dir': directory, where to place assembled pxe menu configs.
+# Path _relative_ to 'pxe_root_path'.
 
 # 'ks_root_path': root www path served by kickstart web server.
 # 'ks_address': IP address of kickstart web server.

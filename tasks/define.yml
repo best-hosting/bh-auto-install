@@ -7,10 +7,6 @@
           {{ item_pxe_root_path }}
         _pxe_cfg_d_path: >-
           {{ hostvars[_pxe_server].pxe_cfg_d_path | default(item_pxe_root_path + '/pxelinux_menus.d') }}
-        _tftp_address: >-
-          {{ hostvars[_pxe_server].tftp_address
-                | default(hostvars[_pxe_server].ansible_default_ipv4.address + ':69')
-          }}
         _pxelinux_cfg: >-
           {{ item_pxelinux_cfg }}
         _pxelinux_incl_dir: >-
@@ -29,27 +25,13 @@
       loop:
         - '_pxe_root_path'
         - '_pxe_cfg_d_path'
-        - '_tftp_address'
         - '_pxelinux_cfg'
         - '_pxelinux_incl_dir'
-
-- block:
-    # I should first check, and then convert (next task, particularly this is
-    # about ip address). Otherwise, i may start converting unknown data.
-    - name: define (kickstart_server) | Check kickstart server config
-      assert:
-        that:
-          - hostvars[_kickstart_server].ks_address | ipaddr
 
     - name: define (kickstart_server) | Define kickstart server config
       set_fact:
         _ks_root_path: >-
           {{ hostvars[_kickstart_server].ks_root_path | default('/srv/www') }}
-        _ks_address: >-
-          {{ item_ks_address }}
-      vars:
-        item_ks_address: >-
-          {{ hostvars[_kickstart_server].ks_address | ipaddr('address') }}
       delegate_facts: true
       delegate_to: "{{ _kickstart_server }}"
 
@@ -58,7 +40,6 @@
         msg: "{{ item + ': ' + hostvars[_kickstart_server][item] }}"
       loop:
         - '_ks_root_path'
-        - '_ks_address'
 
 - block:
     - name: define | Define pxe menus config
@@ -92,6 +73,52 @@
         var: _pxe_menus
 
 - block:
+
+    # FIXME: Check each ip network.
+    # FIXME: Default to nothing.
+    - name: define | Define OS install network config
+      set_fact:
+        _install_conf_net: >-
+          {{
+              {'net' : item_net
+              , 'tftp_address' : item_tftp_address
+              , 'ks_address'   : item_ks_address
+              }
+          }}
+      vars:
+        item_ip0_network: >-
+          {{ install_conf.net[0].ip | ipaddr('network') }}
+        def_ip0: >-
+          {{  { 'gw' : net_conf[item_ip0_network].gw
+                        if net_conf[item_ip0_network].gw is defined
+                        else install_conf.net[0].gw
+              , 'ns' : net_conf[item_ip0_network].ns
+                        if net_conf[item_ip0_network].ns is defined
+                        else install_conf.net[0].ns
+              } if net_conf[item_ip0_network] is defined
+                else
+                { 'gw' : install_conf.net[0].gw
+                , 'ns' : install_conf.net[0].ns
+                }
+          }}
+        item_net: >-
+          {{ [def_ip0 | combine(install_conf.net[0])] + install_conf.net[1:] }}
+        item_tftp_address: >-
+          {{ install_conf.tftp_address
+              if install_conf.tftp_address is defined and install_conf.tftp_address | ipaddr
+              else net_conf[item_ip0_network].tftp
+          }}
+        item_ks_address: >-
+          {{ install_conf.ks_address
+              if install_conf.ks_address is defined and install_conf.ks_address | ipaddr
+              else net_conf[item_ip0_network].ks
+          }}
+      when: install_conf.net is defined
+
+    - name: define | Show OS install net config
+      debug:
+        var: _install_conf_net
+
     - name: define | Define OS install config
       set_fact:
         _pxe_root_path: "{{ hostvars[_pxe_server]._pxe_root_path }}"
@@ -107,11 +134,11 @@
               , 'disks' : ['sda', 'sdb'] if item_raid else ['sda']
               , 'gen_ks' : true
               , 'gen_pxe_host' : true
-              } | combine(install_conf,
+              } | combine(install_conf, _install_conf_net,
                     { 'name'    : item_name
                     , 'pxe_cfg' : _pxe_menus[hosts_pxe_menu].cfg_d + '/50_' + item_name + '.cfg'
                     , 'ks_cfg'  : hostvars[_kickstart_server]._ks_root_path + '/' + item_name + '.cfg'
-                    , 'ks_url'  : 'http://' + hostvars[_kickstart_server]._ks_address + '/' + item_name + '.cfg'
+                    , 'ks_url'  : 'http://' + _install_conf_net.ks_address + '/' + item_name + '.cfg'
                     }
                   )
           }}
@@ -122,30 +149,6 @@
           {{ install_conf.raid | default(default_raid) }}
         item_rootpw_file: >-
           {{ 'passwords/' + item_name }}
-
-    - name: define | Define OS install network config
-      set_fact:
-        _install_conf: >-
-          {{  _install_conf | combine({'net' : item_net}) }}
-      vars:
-        item_ip0_network: >-
-          {{ install_conf.net[0].ip | ipaddr('network') }}
-        def_ip0: >-
-          {{  { 'gw' : default_net[item_ip0_network].gw
-                        if default_net[item_ip0_network].gw is defined
-                        else install_conf.net[0].gw
-              , 'ns' : default_net[item_ip0_network].ns
-                        if default_net[item_ip0_network].ns is defined
-                        else install_conf.net[0].ns
-              } if default_net[item_ip0_network] is defined
-                else
-                { 'gw' : install_conf.net[0].gw
-                , 'ns' : install_conf.net[0].ns
-                }
-          }}
-        item_net: >-
-          {{ [def_ip0 | combine(install_conf.net[0])] + install_conf.net[1:] }}
-      when: install_conf.net is defined
 
     - name: define | Show OS install config
       debug:
