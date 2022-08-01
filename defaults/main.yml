@@ -309,8 +309,10 @@ pxe_menus:
 # 'tftp_address': address _with port_, on which tftpd server should listen.
 # 'pxelinux_incl_dir': directory, where to place assembled pxe menu configs.
 # Path _relative_ to 'pxe_root_path'.
+# 'pxe_nets': list of networks, where this host is pxe server.
 
 # 'ks_root_path': root www path served by kickstart web server.
 # 'ks_address': IP address of kickstart web server.
+# 'ks_nets': list of networks, where this host is kickstart server.
 
 force_overwrite: false

@@ -1,7 +1,11 @@
 ---
 # vars file for bh-auto-install
 
+_tftp_addresses: []
+_ks_addresses: []
+
 # Internal install_conf .
+_install_conf_net: {}
 _install_conf: {}
 
 images_checksum_dir: "{{ playbook_dir + '/image_checksums' }}"

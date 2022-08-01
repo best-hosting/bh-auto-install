@@ -1,5 +1,27 @@
 ---
 
+# Network config.
+- block:
+    - name: define | Check network config keys
+      assert:
+        that:
+          - item | ipaddr('net')
+        fail_msg: "'net_conf' should be indexed by networks in CIDR notation"
+      loop: "{{ net_conf.keys() }}"
+
+    - name: define | Check network config data
+      assert:
+        that:
+          - item.value.gw is defined    and item.value.gw | ipaddr
+          - item.value.ns is defined    and item.value.ns | ipaddr
+          - item.value.tftp is defined  and item.value.tftp | ipaddr
+          - item.value.ks is defined    and item.value.ks | ipaddr
+        fail_msg: "All networks must have gateway ('gw'), nameserver ('ns'), address of tftp server ('tftp') and address of kickstart server ('ks')."
+      loop: "{{ net_conf | dict2items }}"
+      # FIXME: Should i ignore errors here?
+      ignore_errors: true
+
+# PXE server config.
 - block:
     - name: define (pxe_server) | Define pxe server config
       set_fact:
@@ -11,6 +33,7 @@
           {{ item_pxelinux_cfg }}
         _pxelinux_incl_dir: >-
           {{ hostvars[_pxe_server].pxelinux_incl_dir | default(item_pxelinux_cfg | dirname) }}
+      # FIXME: Move defaults to 'defaults/main.yml'
       vars:
         item_pxe_root_path: >-
           {{ hostvars[_pxe_server].pxe_root_path | default('/srv/tftp') }}
@@ -19,15 +42,34 @@
       delegate_facts: true
       delegate_to: "{{ _pxe_server }}"
 
+    - name: define (pxe_server) | Check pxe networks
+      assert:
+        that:
+          - net_conf[item] is defined
+        fail_msg: >-
+          {{ "Network config for '" + item + "' network not found in 'net_conf'." }}
+      loop: "{{ hostvars[_pxe_server].pxe_nets }}"
+
+    - name: define (pxe_server) | Define tftp server addresses
+      set_fact:
+        _tftp_addresses: >-
+          {{ _tftp_addresses + [net_conf[item].tftp + "/" + item | ipaddr('prefix') | string] }}
+      loop: "{{ hostvars[_pxe_server].pxe_nets }}"
+      delegate_facts: true
+      delegate_to: "{{ _pxe_server }}"
+
     - name: define | Show pxe server config
       debug:
-        msg: "{{ item + ': ' + hostvars[_pxe_server][item] }}"
+        msg: "{{ item + ': ' + hostvars[_pxe_server][item] | string }}"
       loop:
         - '_pxe_root_path'
         - '_pxe_cfg_d_path'
         - '_pxelinux_cfg'
         - '_pxelinux_incl_dir'
+        - '_tftp_addresses'
 
+# Kickstart server config.
+- block:
     - name: define (kickstart_server) | Define kickstart server config
       set_fact:
         _ks_root_path: >-
@@ -35,11 +77,34 @@
       delegate_facts: true
       delegate_to: "{{ _kickstart_server }}"
 
+    # FIXME: What if 'ks_nets' is not defined?
+    - name: define (kickstart_server) | Check kickstart networks
+      assert:
+        that:
+          - net_conf[item] is defined
+        fail_msg: >-
+          {{ "Network config for '" + item + "' network not found in 'net_conf'." }}
+      loop: "{{ hostvars[_kickstart_server].ks_nets }}"
+
+    - name: define (kickstart_server) | Define kickstart server addresses
+      set_fact:
+        _ks_addresses: >-
+          {{ _ks_addresses + [net_conf[item].ks + "/" + item | ipaddr('prefix') | string] }}
+      loop: "{{ hostvars[_kickstart_server].ks_nets }}"
+      delegate_facts: true
+      delegate_to: "{{ _kickstart_server }}"
+
     - name: define | Show kickstart server config
       debug:
-        msg: "{{ item + ': ' + hostvars[_kickstart_server][item] }}"
+        msg: "{{ item + ': ' + hostvars[_kickstart_server][item] | string }}"
       loop:
         - '_ks_root_path'
+        - '_ks_addresses'
+
+- name:
+  assert:
+    that:
+      - 1 == 2
 
 - block:
     - name: define | Define pxe menus config
