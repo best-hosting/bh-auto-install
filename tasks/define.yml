@@ -144,34 +144,35 @@
               {{ net_conf.keys()
                   | map('network_in_usable', item_ip)
                   | select('eq', true)
-                  | count > 0
+                  | count == 1
               }}
         fail_msg: >-
           {{ "'install_conf.net' element with 'ip':'"
                   + item.ip
-                  + "' is not a _host_ IP address or does not belong to any network defined in 'net_conf'"
+                  + "' is not a _host_ IP address or does not belong to _exactly_ one network defined in 'net_conf'"
                 if item.ip is defined
                 else "All elements of 'install_conf.net' must have an 'ip' attribute"
           }}
       vars:
         item_ip: >-
           {{ item.ip | default('0.0.0.0') }}
-      #loop: "{{ install_conf.net | map(attribute='ip') | ipaddr('address') | list }}"
       loop: "{{ install_conf.net }}"
 
     # FIXME: Default to nothing.
     - name: define | Define OS install network config
-      set_fact:
-        _install_conf_net: >-
-          {{
-              {'net' : item_net
-              , 'tftp_address' : item_tftp_address
-              , 'ks_address'   : item_ks_address
-              }
-          }}
+      debug:
+        msg: >-
+          {{ item_network }}
       vars:
         item_network: >-
-          {{ item.ip | ipaddr('network') }}
+          {{ ( dict(net_conf.keys()
+                      | zip(net_conf.keys() | map('network_in_usable', item.ip))
+                   )
+                 | dict2items
+                 | selectattr("value", 'eq', true)
+                 | first
+             ).key
+          }}
         def_ip0: >-
           {{  { 'gw' : net_conf[item_ip0_network].gw
                         if net_conf[item_ip0_network].gw is defined
