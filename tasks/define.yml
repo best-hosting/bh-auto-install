@@ -101,12 +101,8 @@
         - '_ks_root_path'
         - '_ks_addresses'
 
-- name:
-  assert:
-    that:
-      - 1 == 2
-
 - block:
+    # FIXME: Make reference to missed pxe menu an error?
     - name: define | Define pxe menus config
       set_fact:
         _pxe_menus: >-
@@ -138,10 +134,72 @@
         var: _pxe_menus
 
 - block:
+    - name: define | Check host IP addresses
+      assert:
+        that:
+          - item.ip is defined
+          - >-
+              {{ [item_ip] | ipaddr('address') | count > 0 }}
+          - >-
+              {{ net_conf.keys()
+                  | map('network_in_usable', item_ip)
+                  | select('eq', true)
+                  | count > 0
+              }}
+        fail_msg: >-
+          {{ "'install_conf.net' element with 'ip':'"
+                  + item.ip
+                  + "' is not a _host_ IP address or does not belong to any network defined in 'net_conf'"
+                if item.ip is defined
+                else "All elements of 'install_conf.net' must have an 'ip' attribute"
+          }}
+      vars:
+        item_ip: >-
+          {{ item.ip | default('0.0.0.0') }}
+      #loop: "{{ install_conf.net | map(attribute='ip') | ipaddr('address') | list }}"
+      loop: "{{ install_conf.net }}"
 
-    # FIXME: Check each ip network.
     # FIXME: Default to nothing.
     - name: define | Define OS install network config
+      set_fact:
+        _install_conf_net: >-
+          {{
+              {'net' : item_net
+              , 'tftp_address' : item_tftp_address
+              , 'ks_address'   : item_ks_address
+              }
+          }}
+      vars:
+        item_network: >-
+          {{ item.ip | ipaddr('network') }}
+        def_ip0: >-
+          {{  { 'gw' : net_conf[item_ip0_network].gw
+                        if net_conf[item_ip0_network].gw is defined
+                        else install_conf.net[0].gw
+              , 'ns' : net_conf[item_ip0_network].ns
+                        if net_conf[item_ip0_network].ns is defined
+                        else install_conf.net[0].ns
+              } if net_conf[item_ip0_network] is defined
+                else
+                { 'gw' : install_conf.net[0].gw
+                , 'ns' : install_conf.net[0].ns
+                }
+          }}
+        item_net: >-
+          {{ [def_ip0 | combine(install_conf.net[0])] + install_conf.net[1:] }}
+        item_tftp_address: >-
+          {{ install_conf.tftp_address
+              if install_conf.tftp_address is defined and install_conf.tftp_address | ipaddr
+              else net_conf[item_ip0_network].tftp
+          }}
+        item_ks_address: >-
+          {{ install_conf.ks_address
+              if install_conf.ks_address is defined and install_conf.ks_address | ipaddr
+              else net_conf[item_ip0_network].ks
+          }}
+      loop: "{{ install_conf.net }}"
+
+    - name: define old | Define OS install network config
       set_fact:
         _install_conf_net: >-
           {{
@@ -178,12 +236,14 @@
               if install_conf.ks_address is defined and install_conf.ks_address | ipaddr
               else net_conf[item_ip0_network].ks
           }}
-      when: install_conf.net is defined
 
     - name: define | Show OS install net config
       debug:
         var: _install_conf_net
 
+  when: install_conf.net is defined
+
+- block:
     - name: define | Define OS install config
       set_fact:
         _pxe_root_path: "{{ hostvars[_pxe_server]._pxe_root_path }}"
