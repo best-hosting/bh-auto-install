@@ -87,7 +87,7 @@
           }}
       vars:
         item_ip0_network: >-
-          {{ install_conf.net[0].ip | ipaddr('network') }}
+          {{ install_conf.net[0].ip | ipaddr('network/prefix') }}
         def_ip0: >-
           {{  { 'gw' : net_conf[item_ip0_network].gw
                         if net_conf[item_ip0_network].gw is defined
