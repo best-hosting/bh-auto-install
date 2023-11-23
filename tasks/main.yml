@@ -71,5 +71,4 @@
 
   when: inventory_hostname in groups['new'] and not inventory_hostname in groups['dummy']
   tags:
-    - access_details
-    - always
+    - pxe_host
